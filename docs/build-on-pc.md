@@ -6,8 +6,9 @@ own** XE24 factory image. CI builds the same tree, but without those binaries
 (`tools/ci-blob-stubs.sh`). Its images are a build check and must never be booted.
 
 Everything runs on your PC. No account, credential or remote access is needed beyond anonymous
-downloads from GitHub, android.googlesource.com, storage.googleapis.com (the `repo` tool) and
-the Ubuntu archive (the build container).
+downloads from GitHub (our repositories, omap4-aosp, android-security, and KFire-Android for the
+GPU kernel module source), android.googlesource.com (AOSP), storage.googleapis.com
+(the `repo` tool), Docker Hub (`ubuntu:14.04`) and the Ubuntu archive (the build containers).
 
 ## What you need
 
@@ -15,14 +16,14 @@ the Ubuntu archive (the build container).
   not.
 - Disk: the script stops below 70 GB free. Plan for about 100 GB for one build; a 200 GB SSD is
   enough.
-  - Source: about 25 GB. This is a guess until the first CI run measures it; the measured number
-    will be recorded here.
+  - Source: 11 GB after `repo sync` (measured on the CI runner, 2026-10-21).
   - Output: about 30-40 GB, also a guess.
-  - The glass-kernel build: a few GB.
+  - The glass-kernel build: a few GB, in `~/glass-kk/.work/` and the docker volume
+    `glass-kernel-src`.
   - Containers: about 1 GB.
 - RAM: 16 GB, or 8 GB plus 8 GB of swap.
-- Packages: `git`, `python3`, `curl`, `binutils` (readelf), `unzip`, and Docker. Your user must
-  be able to run `docker` (the `docker` group, or rootless Docker). The build itself runs in an
+- Packages: `git` 2.25 or newer, `python3`, `curl`, `binutils` (readelf), `unzip`, `coreutils` (sha256sum), `e2fsprogs` (debugfs, for `extract_vendor.py`), and Docker. Your user must
+  be able to run `docker` (the `docker` group; rootless Docker is detected). The build itself runs in an
   Ubuntu 14.04 container with OpenJDK 6 and make 3.81 (`tools/docker/Dockerfile`), so nothing
   else needs installing on the PC.
 - Your XE24 raw system image. With [glass-rom](https://github.com/OpenMyGlass/glass-rom), as in

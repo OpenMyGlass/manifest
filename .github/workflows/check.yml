@@ -22,7 +22,7 @@ jobs:
         run: shellcheck -s sh tools/*.sh
       - name: XML
         run: |
-          sudo apt-get install -y -q libxml2-utils >/dev/null
+          command -v xmllint >/dev/null || { sudo apt-get update -q && sudo apt-get install -y -q libxml2-utils; }
           xmllint --noout default.xml aosp.xml
       - name: Manifest against AOSP's android-4.4.4_r2.0.1 manifest
         run: |

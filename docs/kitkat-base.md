@@ -11,10 +11,10 @@ Task 1. This page records which OMAP4 hardware projects the build uses, and why.
 |---|---|---|
 | AOSP | `android-4.4.4_r2.0.1` (`aosp.xml`, unchanged except the remote URL) | tag |
 | `hardware/ti/omap4` | [omap4-aosp/android_hardware_ti_omap4](https://github.com/omap4-aosp/android_hardware_ti_omap4) `aosp-4.4` | `a99c69f` |
-| `build` | [omap4-aosp/android_build](https://github.com/omap4-aosp/android_build) `aosp-4.4` | `ba41986` |
+| `build` | our fork of [omap4-aosp/android_build](https://github.com/omap4-aosp/android_build) `aosp-4.4` (`ba41986`), plus Cortex-A9 code generation | fork |
 | `frameworks/native` | our fork of android-security's `aosp-4.4`, plus omap4-aosp's three OMAP4 screenshot commits and our installd change | fork |
 | `libnativehelper` | our fork of AOSP `android-4.4.4_r2.0.1`, with the JNI fallback set to ART | fork |
-| 32 other AOSP projects | [android-security](https://github.com/android-security) `aosp-4.4`: Google's KitKat security fixes backported (bionic, art, frameworks/base and av, system/core, webview, openssl and others) | each pinned |
+| 42 other AOSP projects | [android-security](https://github.com/android-security) `aosp-4.4`: Google's KitKat security fixes backported, the set of its own `aosp-4.4` manifest (bionic, art, frameworks/base and av, system/core and media, sepolicy, webview, openssl and others) | each pinned |
 | `device/glass/glass-1` | [OpenMyGlass/android_device_glass_glass-1](https://github.com/OpenMyGlass/android_device_glass_glass-1) `android-4.4.4` | commit |
 
 omap4-aosp is the organisation that later became Unlegacy-Android. Its `aosp-4.4` manifest
@@ -22,7 +22,12 @@ omap4-aosp is the organisation that later became Unlegacy-Android. Its `aosp-4.4
 `android-4.4.4_r2.0.1` plus:
 - its `build` and `frameworks/native`;
 - `hardware/ti/omap4`;
-- the android-security projects.
+- 32 android-security projects.
+
+This manifest takes the android-security set from android-security's own `aosp-4.4` manifest
+instead (42 projects): their later fixes need projects omap4-aosp's 2016 list lacks. The first
+CI build stopped in `frameworks/av` because its Visualizer fix needs `MEASUREMENT_COUNT` from
+android-security's `system/media`.
 
 Its manifest builds KitKat for the Galaxy Nexus (tuna) and the Galaxy Tab 2 (espresso). This
 manifest follows it, without those devices and their vendor repositories.
@@ -98,6 +103,8 @@ Each fork has a branch `glass-4.4`, and each change to it is a pull request with
   - installd: ART only, with dex2oat compiler filters.
 - [android_libnativehelper](https://github.com/OpenMyGlass/android_libnativehelper) (plan Task 2): AOSP
   `android-4.4.4_r2.0.1`, with the device's JNI fallback runtime set to `libart.so`.
+- [android_build](https://github.com/OpenMyGlass/android_build) (plan Task 4): omap4-aosp's `aosp-4.4`,
+  with `-mcpu=cortex-a9` and `--no-fix-cortex-a8` for the A9.
 
 Not forked, because nothing needs a patch:
 - `frameworks/base`: SystemServer writes back `VMRuntime.vmLibrary()`, which is always
@@ -123,7 +130,8 @@ Not forked, because nothing needs a patch:
 `sdk` and `development` stay: `build/core/main.mk` includes `sdk/build/windows_sdk_whitelist.mk`
 unconditionally.
 
-Checkout size: not measured yet. The first CI build attempt records it ("build", job summary).
+Checkout size: 11 GB after `repo sync -c --depth=1` with these groups (CI run 39690816142, 86 s on
+a standard runner).
 
 ## Checks
 

@@ -60,7 +60,7 @@ def check(root=ROOT, upstream_text=None):
         problems.append(f"default.xml remotes {top_remotes}, want github=https://github.com/")
 
     projects = {p.get("name"): p for p in aosp.iter("project")}
-    paths = {p.get("path"): p.get("name") for p in aosp.iter("project")}
+    paths = {p.get("path") or p.get("name"): p.get("name") for p in aosp.iter("project")}
     removed = []
     for rp in top.iter("remove-project"):
         name = rp.get("name")
@@ -70,7 +70,7 @@ def check(root=ROOT, upstream_text=None):
             problems.append(f"remove-project {name}: twice")
         else:
             removed.append(name)
-            del paths[projects[name].get("path")]
+            del paths[projects[name].get("path") or name]
 
     for p in top.iter("project"):
         name, path, rev = p.get("name"), p.get("path"), p.get("revision") or ""

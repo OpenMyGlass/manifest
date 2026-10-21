@@ -8,7 +8,9 @@
 #   tools/build-kitkat.sh --tree DIR --stubs [options]       (no blobs: build check only)
 #
 # Options:
-#   --tree DIR           checkout directory (created; about 25 GB of source)
+#   --tree DIR           checkout directory (created; about 11 GB of source). DIR/.work holds
+#                        the glass-kernel and glass-rom checkouts; glass-kernel also uses the
+#                        docker volume glass-kernel-src (about 2 GB)
 #   --out DIR            build output directory (default DIR/out; about 30-40 GB)
 #   --system-raw FILE    the owner's raw XE24 system image (glass-rom: fetch-factory.sh, sparse.py)
 #   --stubs              build without blobs (tools/ci-blob-stubs.sh); the image must not be booted
@@ -41,7 +43,7 @@ while [ $# -gt 0 ]; do
         --skip-sync) skip_sync=yes; shift ;;
         --skip-kernel) skip_kernel=yes; shift ;;
         --keep-going) keep_going=-k; shift ;;
-        -h|--help) sed -n '2,24p' "$0"; exit 0 ;;
+        -h|--help) sed -n '2,21p' "$0"; exit 0 ;;
         *) die "unknown option $1 (see --help)" ;;
     esac
 done
@@ -53,10 +55,18 @@ if [ "$stubs" = no ] && [ -z "$system_raw" ]; then die "--system-raw FILE (or --
 # Preflight.
 [ "$(uname -s)" = Linux ] || die "Linux only (AOSP 4.4 needs a case-sensitive file system)"
 [ "$(uname -m)" = x86_64 ] || die "x86_64 only (AOSP 4.4's prebuilt host tools)"
-for t in git python3 curl docker readelf unzip; do
+for t in git python3 curl docker readelf unzip sha256sum; do
     command -v "$t" >/dev/null || die "$t not found"
 done
-docker info >/dev/null 2>&1 || die "docker is installed but not usable by $(id -un) (add the user to the docker group, or use rootless docker)"
+if [ "$stubs" = no ] && ! command -v debugfs >/dev/null && [ ! -x /sbin/debugfs ]; then
+    die "debugfs not found (e2fsprogs); extract_vendor.py needs it"
+fi
+git_minor=$(git --version | awk '{split($3, v, "."); print v[1] * 100 + v[2]}')
+[ "$git_minor" -ge 225 ] || die "git 2.25 or newer is needed (glass-kernel's fetch-pvr.sh)"
+docker info >/dev/null 2>&1 || die "docker is installed but not usable by $(id -un) (add the user to the docker group)"
+# Rootless docker maps the host user to root in the container: run as root there.
+user_opt="-u $(id -u):$(id -g)"
+if docker info -f '{{.SecurityOptions}}' 2>/dev/null | grep -q rootless; then user_opt=''; fi
 mkdir -p "$tree"
 tree=$(cd "$tree" && pwd)
 out=${out:-$tree/out}
@@ -103,12 +113,13 @@ if [ "$skip_sync" = no ]; then
     step "repo sync" "$t"
     echo "source: $(du -sh --exclude=out "$tree" | cut -f1)" >> "$numbers"
 fi
-(cd "$tree" && "${repo:-repo}" manifest -r -o "$tree/manifest-pinned.xml" 2>/dev/null) || true
+[ -n "${repo:-}" ] || repo=$(command -v repo || echo "$tree/.bin/repo")
+(cd "$tree" && "$repo" manifest -r -o "$tree/manifest-pinned.xml" 2>/dev/null) || true
 
 # 2. Kernel and SGX module (glass-kernel, tuned-stable).
 if [ "$skip_kernel" = no ]; then
     t=$(now)
-    "$here/fetch-kernel.sh" "$tree" "$tree/../glass-kernel-work"
+    "$here/fetch-kernel.sh" "$tree" "$tree/.work/glass-kernel"
     step "kernel" "$t"
 fi
 
@@ -116,10 +127,11 @@ fi
 rm -rf "$tree/vendor/glass/glass-1"
 if [ "$stubs" = yes ]; then
     "$here/ci-blob-stubs.sh" "$tree"
+    echo "warning: --stubs: the images in $out are a build check only; never boot them"
 else
     # shellcheck disable=SC1091
     . "$here/glass-rom.env"
-    rom=$tree/../glass-rom-tools
+    rom=$tree/.work/glass-rom
     [ -d "$rom/.git" ] || git clone -q "$GLASS_ROM_REPO" "$rom"
     git -C "$rom" fetch -q origin "$GLASS_ROM_COMMIT"
     git -C "$rom" checkout -q --detach "$GLASS_ROM_COMMIT"
@@ -130,9 +142,10 @@ fi
 # 4. Build in the pinned Ubuntu 14.04 container.
 t=$(now)
 docker build -q -t "$image" "$here/docker" >/dev/null
-docker run --rm -u "$(id -u):$(id -g)" -e HOME=/tmp -e OUT_DIR=/out \
+# shellcheck disable=SC2086  # user_opt is empty or two words
+docker run --rm $user_opt -e HOME=/tmp -e USER="$(id -un)" -e OUT_DIR=/out \
     -v "$tree:/aosp" -v "$out:/out" "$image" \
-    bash -c ". build/envsetup.sh >/dev/null && lunch $lunch_combo >/dev/null && make -j$jobs $keep_going" \
+    bash -c ". build/envsetup.sh >/dev/null && lunch $lunch_combo >/dev/null && make -j$jobs -l$jobs $keep_going" \
     > "$tree/build.log" 2>&1 || {
         step "build (failed)" "$t"
         grep -n -E 'error:|Error [0-9]+|\*\*\*' "$tree/build.log" | head -n 60 || true
@@ -146,7 +159,9 @@ product=$out/target/product/glass-1
 vendor_dir=''
 [ "$stubs" = yes ] || vendor_dir=$tree/vendor/glass/glass-1/proprietary
 status=0
-"$here/check-build.sh" "$tree" "$product" ${vendor_dir:+"$vendor_dir"} | tee "$tree/check-build.txt" || status=1
+"$here/check-build.sh" "$tree" "$product" ${vendor_dir:+"$vendor_dir"} > "$tree/check-build.txt" 2>&1 \
+    || status=1
+cat "$tree/check-build.txt"
 {
     echo "output: $(du -sh "$out" | cut -f1)"
     echo "free at end: $(avail_gb "$tree") GB (tree), $(avail_gb "$out") GB (out)"

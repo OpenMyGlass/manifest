@@ -4,7 +4,7 @@
 
   OpenMyGlass: Android 4.4.4 (KitKat, ART only) for Google Glass Explorer Edition.
   Base and choices: docs/kitkat-base.md. Every project outside AOSP is pinned to a commit
-  (revision); "upstream" names the branch the commit was taken from.
+  (revision); "upstream" names the branch the commit is on, or will be merged into.
 
   Checkout and build: docs/build-on-pc.md (tools/build-kitkat.sh).
 -->

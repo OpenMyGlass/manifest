@@ -34,14 +34,16 @@ absent framework/core.jar
 
 # build.prop.
 prop() {
-    v=$(grep -m1 "^$1=" "$sys/build.prop" | cut -d= -f2-)
+    # The last assignment wins for properties that are not ro.
+    v=$(grep "^$1=" "$sys/build.prop" | tail -n 1 | cut -d= -f2-)
     if [ "$v" = "$2" ]; then ok "build.prop $1=$2"; else bad "build.prop $1='$v', want '$2'"; fi
 }
 prop persist.sys.dalvik.vm.lib libart.so
 prop persist.glass.d2o.sys speed
 prop persist.glass.d2o.usr space
 
-# No pre-optimisation: no .odex, and code stays in the APKs and jars.
+# No pre-optimisation: no .odex. APKs and jars without classes.dex are listed for review
+# (resource-only packages have none).
 odex=$(find "$sys" -name '*.odex' | wc -l)
 if [ "$odex" -eq 0 ]; then ok "no .odex files"; else bad "$odex .odex files"; fi
 archives=$(mktemp)
@@ -76,7 +78,8 @@ fi
 rm -f "$elf_hits"
 
 # No makefile outside dalvik/ names libdvm.
-mk_hits=$(cd "$tree" && grep -rl --include=Android.mk -w libdvm . 2>/dev/null \
+mk_hits=$(cd "$tree" && grep -rl --include=Android.mk --exclude-dir=.repo --exclude-dir=out --exclude-dir=.work \
+    -w libdvm . 2>/dev/null \
     | grep -v '^\./dalvik/' | grep -v '^\./out/' | sort)
 if [ -n "$mk_hits" ]; then
     bad "Android.mk files outside dalvik/ that name libdvm:"; echo "$mk_hits" | sed 's/^/      /'
