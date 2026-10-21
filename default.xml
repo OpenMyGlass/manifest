@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  SPDX-License-Identifier: Apache-2.0
+
+  OpenMyGlass: Android 4.4.4 (KitKat, ART only) for Google Glass Explorer Edition.
+  Base and choices: docs/kitkat-base.md. Every project outside AOSP is pinned to a commit
+  (revision); "upstream" names the branch the commit was taken from.
+
+  Checkout and build: docs/build-on-pc.md (tools/build-kitkat.sh).
+-->
+<manifest>
+
+  <!-- AOSP android-4.4.4_r2.0.1, unchanged except for the remote URL (tools/check_manifest.py). -->
+  <include name="aosp.xml" />
+
+  <remote name="github" fetch="https://github.com/" />
+
+  <!-- Not needed for one ARM device (docs/kitkat-base.md, "Trimming"). -->
+  <remove-project name="device/asus/deb" />
+  <remove-project name="device/asus/flo" />
+  <remove-project name="device/asus/flo-kernel" />
+  <remove-project name="device/asus/grouper" />
+  <remove-project name="device/asus/tilapia" />
+  <remove-project name="device/google/accessory/arduino" />
+  <remove-project name="device/google/accessory/demokit" />
+  <remove-project name="device/lge/hammerhead" />
+  <remove-project name="device/lge/hammerhead-kernel" />
+  <remove-project name="device/lge/mako" />
+  <remove-project name="device/lge/mako-kernel" />
+  <remove-project name="device/samsung/manta" />
+  <remove-project name="platform/hardware/qcom/audio" />
+  <remove-project name="platform/hardware/qcom/bt" />
+  <remove-project name="platform/hardware/qcom/camera" />
+  <remove-project name="platform/hardware/qcom/display" />
+  <remove-project name="platform/hardware/qcom/keymaster" />
+  <remove-project name="platform/hardware/qcom/media" />
+  <remove-project name="platform/hardware/qcom/msm8960" />
+  <remove-project name="platform/hardware/qcom/msm8x74" />
+  <remove-project name="platform/hardware/qcom/power" />
+  <remove-project name="platform/hardware/qcom/sensors" />
+  <remove-project name="platform/hardware/qcom/wlan" />
+  <remove-project name="platform/hardware/samsung_slsi/exynos5" />
+  <remove-project name="platform/hardware/ti/omap3" />
+  <remove-project name="platform/hardware/ti/omap4xxx" />
+  <remove-project name="platform/cts" />
+  <remove-project name="platform/developers/build" />
+  <remove-project name="platform/developers/demos" />
+  <remove-project name="platform/developers/docs" />
+  <remove-project name="platform/developers/samples/android" />
+  <remove-project name="platform/external/eclipse-basebuilder" />
+  <remove-project name="platform/external/eclipse-windowbuilder" />
+
+  <!-- OMAP4 projects from omap4-aosp (later Unlegacy-Android), branch aosp-4.4, unmodified. -->
+  <remove-project name="platform/build" />
+  <project path="build" name="omap4-aosp/android_build" remote="github" groups="pdk"
+           revision="ba4198604bcda7ec42e3d8870c9a8ff1fb1f4a89" upstream="aosp-4.4" >
+    <copyfile src="core/root.mk" dest="Makefile" />
+  </project>
+  <project path="hardware/ti/omap4" name="omap4-aosp/android_hardware_ti_omap4" remote="github" groups="omap4"
+           revision="a99c69f02e20af59e760763a284a984e6af45ad9" upstream="aosp-4.4" />
+
+  <!-- Our forks (patched; each change is a pull request in the fork). -->
+  <remove-project name="platform/frameworks/native" />
+  <project path="frameworks/native" name="OpenMyGlass/android_frameworks_native" remote="github" groups="pdk"
+           revision="b59d34b44d15ca469cff4912f91ed768ba1e7e79" upstream="glass-4.4" />
+  <remove-project name="platform/libnativehelper" />
+  <project path="libnativehelper" name="OpenMyGlass/android_libnativehelper" remote="github" groups="pdk-java"
+           revision="0546a9fd0231ff6f0af9fe14e0141850549e37fc" upstream="glass-4.4" />
+
+  <!-- The Glass device tree, KitKat branch. -->
+  <project path="device/glass/glass-1" name="OpenMyGlass/android_device_glass_glass-1" remote="github"
+           revision="ff373bd88d2b218e08a3c26b9830981eadd7c039" upstream="android-4.4.4" />
+
+  <!-- AOSP projects with Google's KitKat security fixes backported, from android-security,
+       branch aosp-4.4, unmodified (the set omap4-aosp used). -->
+  <remove-project name="platform/art" />
+  <project path="art" name="android-security/android_art" remote="github" revision="479fe13d929012cd45c7a92ce140dae0b71e026f" upstream="aosp-4.4" />
+  <remove-project name="platform/bionic" />
+  <project path="bionic" name="android-security/android_bionic" remote="github" groups="pdk" revision="b351ec422dd055a372052a8b152a300ad06b3b34" upstream="aosp-4.4" />
+  <remove-project name="platform/bootable/recovery" />
+  <project path="bootable/recovery" name="android-security/android_bootable_recovery" remote="github" groups="pdk" revision="2dd650e1cbaf1ed308ef659737732adf73aaee84" upstream="aosp-4.4" />
+  <remove-project name="platform/dalvik" />
+  <project path="dalvik" name="android-security/android_dalvik" remote="github" revision="9d90ae2f9c6f3684d45dffe6000c83a5cfcc9e03" upstream="aosp-4.4" />
+  <remove-project name="platform/external/aac" />
+  <project path="external/aac" name="android-security/android_external_aac" remote="github" groups="pdk" revision="ed6db52587a07ae7d1ae735b788be117d0f7cd3e" upstream="aosp-4.4" />
+  <remove-project name="platform/external/bluetooth/bluedroid" />
+  <project path="external/bluetooth/bluedroid" name="android-security/android_external_bluetooth_bluedroid" remote="github" groups="pdk" revision="0ad4befd2b8d29ebae67f93ffa2d3bd86d298423" upstream="aosp-4.4" />
+  <remove-project name="platform/external/bouncycastle" />
+  <project path="external/bouncycastle" name="android-security/android_external_bouncycastle" remote="github" revision="19dac08256aeeb2089f7a8567d237dcceb3fe219" upstream="aosp-4.4" />
+  <remove-project name="platform/external/chromium_org" />
+  <project path="external/chromium_org" name="android-security/android_external_chromium_org" remote="github" revision="797ceca9e01a052ed40a939abf1369766b83562c" upstream="aosp-4.4" />
+  <remove-project name="platform/external/chromium_org/third_party/openssl" />
+  <project path="external/chromium_org/third_party/openssl" name="android-security/android_external_chromium_org_third_party_openssl" remote="github" revision="fc78c2134783ad0ae1cfb6b9434fe46c9e324871" upstream="aosp-4.4" />
+  <remove-project name="platform/external/dhcpcd" />
+  <project path="external/dhcpcd" name="android-security/android_external_dhcpcd" remote="github" revision="2a4c62705081c64ed4f534bf74720cfe527b9fd0" upstream="aosp-4.4" />
+  <remove-project name="platform/external/flac" />
+  <project path="external/flac" name="android-security/android_external_flac" remote="github" groups="pdk" revision="186999fb06d197713322de5173c8c97ce15d5ffa" upstream="aosp-4.4" />
+  <remove-project name="platform/external/jhead" />
+  <project path="external/jhead" name="android-security/android_external_jhead" remote="github" groups="pdk" revision="9a1a535dcb41fe94fc6b06cf880c33d69cc43f18" upstream="aosp-4.4" />
+  <remove-project name="platform/external/libvpx" />
+  <project path="external/libvpx" name="android-security/android_external_libvpx" remote="github" groups="pdk" revision="ca50593b6faf6e7eec44f7ea914566342f9f742a" upstream="aosp-4.4" />
+  <remove-project name="platform/external/okhttp" />
+  <project path="external/okhttp" name="android-security/android_external_okhttp" remote="github" revision="eae39447887e66fa3e27eb664245625e5cf2720f" upstream="aosp-4.4" />
+  <remove-project name="platform/external/openssl" />
+  <project path="external/openssl" name="android-security/android_external_openssl" remote="github" groups="pdk" revision="14de87dde909ca39d8b54acbdf11e7c96ea82a65" upstream="aosp-4.4" />
+  <remove-project name="platform/external/skia" />
+  <project path="external/skia" name="android-security/android_external_skia" remote="github" revision="ab8848a12f1cf41dd7472d78993d737fd2f2cc16" upstream="aosp-4.4" />
+  <remove-project name="platform/external/sonivox" />
+  <project path="external/sonivox" name="android-security/android_external_sonivox" remote="github" groups="pdk" revision="05c98aeee1fe106a43bebc71fbc99366b7d3049a" upstream="aosp-4.4" />
+  <remove-project name="platform/external/sqlite" />
+  <project path="external/sqlite" name="android-security/android_external_sqlite" remote="github" groups="pdk" revision="07cb705ff777da5ec147eb7d2fa0cc4657e6762b" upstream="aosp-4.4" />
+  <remove-project name="platform/external/tremolo" />
+  <project path="external/tremolo" name="android-security/android_external_tremolo" remote="github" groups="pdk" revision="16cfb85f871c6c219a5a7ff65ca089895fe550ad" upstream="aosp-4.4" />
+  <remove-project name="platform/external/wpa_supplicant_8" />
+  <project path="external/wpa_supplicant_8" name="android-security/android_external_wpa_supplicant_8" remote="github" groups="pdk" revision="27c5b9b64c33cf5ddc7eaaaec7570c0c3e9903bd" upstream="aosp-4.4" />
+  <remove-project name="platform/frameworks/av" />
+  <project path="frameworks/av" name="android-security/android_frameworks_av" remote="github" groups="pdk" revision="33e8392def31a7b8b0adfdcf2a9779bdae3693f6" upstream="aosp-4.4" />
+  <remove-project name="platform/frameworks/base" />
+  <project path="frameworks/base" name="android-security/android_frameworks_base" remote="github" revision="1056ab76ec6a40fda1634f2d40c8ef82a50f5019" upstream="aosp-4.4" />
+  <remove-project name="platform/libcore" />
+  <project path="libcore" name="android-security/android_libcore" remote="github" revision="e3aeb056b2d3a78dc76f3d45499941ca6513ad9f" upstream="aosp-4.4" />
+  <remove-project name="platform/packages/apps/Bluetooth" />
+  <project path="packages/apps/Bluetooth" name="android-security/android_packages_apps_Bluetooth" remote="github" revision="c3a81d94797647951b5fa3d15b51f585dcb15d40" upstream="aosp-4.4" />
+  <remove-project name="platform/packages/apps/CertInstaller" />
+  <project path="packages/apps/CertInstaller" name="android-security/android_packages_apps_CertInstaller" remote="github" revision="a8fcb2b437ef373f5c6e00a85f87c03591f7c07b" upstream="aosp-4.4" />
+  <remove-project name="platform/packages/apps/Mms" />
+  <project path="packages/apps/Mms" name="android-security/android_packages_apps_Mms" remote="github" revision="ea70340adb7d0b029d68637688c595c50e8ed5c1" upstream="aosp-4.4" />
+  <remove-project name="platform/packages/apps/Nfc" />
+  <project path="packages/apps/Nfc" name="android-security/android_packages_apps_Nfc" remote="github" revision="033f035a80bdab91a7596f68620601c7392396fc" upstream="aosp-4.4" />
+  <remove-project name="platform/packages/apps/Settings" />
+  <project path="packages/apps/Settings" name="android-security/android_packages_apps_Settings" remote="github" revision="b835e1b255c6c4ed952686611b6d1adaadb97594" upstream="aosp-4.4" />
+  <remove-project name="platform/packages/apps/UnifiedEmail" />
+  <project path="packages/apps/UnifiedEmail" name="android-security/android_packages_apps_UnifiedEmail" remote="github" revision="a1737ed3dba696af40d7ea1e1dc5d89c561c35c2" upstream="aosp-4.4" />
+  <remove-project name="platform/packages/services/Telephony" />
+  <project path="packages/services/Telephony" name="android-security/android_packages_services_Telephony" remote="github" revision="ca92119b7b8c7f2139a5dbfeccf36780f2dd45a2" upstream="aosp-4.4" />
+  <remove-project name="platform/system/core" />
+  <project path="system/core" name="android-security/android_system_core" remote="github" groups="pdk" revision="f8b2fe863354f13d12077a29390a8ba991954feb" upstream="aosp-4.4" />
+  <remove-project name="platform/system/security" />
+  <project path="system/security" name="android-security/android_system_security" remote="github" groups="pdk" revision="269371019ffb84c353e874fd616a884c9e4e6d4b" upstream="aosp-4.4" />
+
+</manifest>
