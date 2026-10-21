@@ -36,7 +36,7 @@ class CheckManifestTest(unittest.TestCase):
         self.assertTrue(self.problems(upstream_text=upstream.replace("platform/art", "x/art")))
 
     def test_branch_instead_of_commit(self):
-        self.edit("default.xml", 'revision="ba4198604bcda7ec42e3d8870c9a8ff1fb1f4a89"',
+        self.edit("default.xml", 'revision="a99c69f02e20af59e760763a284a984e6af45ad9"',
                   'revision="aosp-4.4"')
         self.assertTrue(any("40-hex" in p for p in self.problems()))
 

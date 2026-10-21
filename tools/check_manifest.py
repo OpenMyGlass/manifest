@@ -20,11 +20,12 @@ SHA = re.compile(r"[0-9a-f]{40}")
 # GitHub organisations a project may come from, and why (docs/kitkat-base.md).
 ORGS = {
     "OpenMyGlass": "our repositories and forks",
-    "omap4-aosp": "OMAP4 hardware and build (later Unlegacy-Android)",
+    "omap4-aosp": "OMAP4 hardware (later Unlegacy-Android)",
     "android-security": "AOSP projects with KitKat security fixes",
 }
 # Our forks: path -> repository. Every other OpenMyGlass project is not a fork.
 FORKS = {
+    "build": "OpenMyGlass/android_build",
     "frameworks/native": "OpenMyGlass/android_frameworks_native",
     "libnativehelper": "OpenMyGlass/android_libnativehelper",
 }

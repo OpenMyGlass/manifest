@@ -17,11 +17,12 @@
 #   --jobs N             make -j (default: number of CPUs)
 #   --skip-sync          reuse the existing checkout
 #   --skip-kernel        reuse DIR/vendor/glass/kernel
+#   --keep-going         make -k: build as much as possible and list every failure
 # Writes a summary with timings and sizes to DIR/build-numbers.txt.
 set -eu
 
 here=$(cd "$(dirname "$0")" && pwd)
-tree='' out='' system_raw='' stubs=no jobs='' skip_sync=no skip_kernel=no
+tree='' out='' system_raw='' stubs=no jobs='' skip_sync=no skip_kernel=no keep_going=''
 manifest_url=https://github.com/OpenMyGlass/manifest
 manifest_rev=main
 lunch_combo=aosp_glass_1-userdebug
@@ -39,7 +40,8 @@ while [ $# -gt 0 ]; do
         --jobs) jobs=$2; shift 2 ;;
         --skip-sync) skip_sync=yes; shift ;;
         --skip-kernel) skip_kernel=yes; shift ;;
-        -h|--help) sed -n '2,23p' "$0"; exit 0 ;;
+        --keep-going) keep_going=-k; shift ;;
+        -h|--help) sed -n '2,24p' "$0"; exit 0 ;;
         *) die "unknown option $1 (see --help)" ;;
     esac
 done
@@ -130,10 +132,11 @@ t=$(now)
 docker build -q -t "$image" "$here/docker" >/dev/null
 docker run --rm -u "$(id -u):$(id -g)" -e HOME=/tmp -e OUT_DIR=/out \
     -v "$tree:/aosp" -v "$out:/out" "$image" \
-    bash -c ". build/envsetup.sh >/dev/null && lunch $lunch_combo >/dev/null && make -j$jobs" \
+    bash -c ". build/envsetup.sh >/dev/null && lunch $lunch_combo >/dev/null && make -j$jobs $keep_going" \
     > "$tree/build.log" 2>&1 || {
         step "build (failed)" "$t"
-        tail -n 40 "$tree/build.log"
+        grep -n -E 'error:|Error [0-9]+|\*\*\*' "$tree/build.log" | head -n 60 || true
+        tail -n 20 "$tree/build.log"
         die "build failed; full log: $tree/build.log"
     }
 step "build" "$t"
