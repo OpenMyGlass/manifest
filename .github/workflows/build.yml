@@ -1,0 +1,60 @@
+# SPDX-License-Identifier: Apache-2.0
+# Full Track A build on a free standard runner, without blobs (tools/ci-blob-stubs.sh): the
+# image is a build check only and is not uploaded. Records disk and time in the job summary
+# and in the "build-report" artifact. Run by hand (Actions, build, Run workflow).
+name: build
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 360
+    env:
+      TREE: /home/runner/aosp
+      OUT: /mnt/aosp-out
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Disk before
+        run: |
+          { echo '## Disk at start'; echo '```'; df -h / /mnt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+          nproc; free -g
+      - name: Free disk space
+        run: |
+          t=$(date +%s)
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /usr/local/.ghcup \
+            /opt/hostedtoolcache /usr/local/share/boost /usr/share/swift \
+            /usr/local/share/powershell /usr/local/lib/node_modules /usr/local/share/chromium \
+            /opt/microsoft /opt/google /opt/az /usr/lib/jvm
+          sudo docker image prune -af >/dev/null
+          sudo mkdir -p "$OUT" && sudo chown "$(id -u):$(id -g)" "$OUT"
+          { echo "## Disk after cleanup ($(( $(date +%s) - t )) s)"; echo '```'; df -h / /mnt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+      - name: Build (no blobs)
+        run: |
+          git branch -f ci-build HEAD
+          tools/build-kitkat.sh --tree "$TREE" --out "$OUT" --stubs \
+            --manifest-url "$GITHUB_WORKSPACE" --manifest-rev ci-build
+      - name: Report
+        if: always()
+        run: |
+          {
+            echo '## Disk at end'; echo '```'; df -h / /mnt; echo '```'
+            echo '## Numbers'; echo '```'; cat "$TREE/build-numbers.txt" 2>/dev/null || echo none; echo '```'
+            echo '## Checks'; echo '```'; cat "$TREE/check-build.txt" 2>/dev/null || echo none; echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+          mkdir -p "$RUNNER_TEMP/report"
+          df -h / /mnt > "$RUNNER_TEMP/report/df.txt"
+          for f in build-numbers.txt check-build.txt manifest-pinned.xml; do
+            cp "$TREE/$f" "$RUNNER_TEMP/report/" 2>/dev/null || true
+          done
+          tail -n 300 "$TREE/build.log" > "$RUNNER_TEMP/report/build-log-tail.txt" 2>/dev/null || true
+          du -sh "$TREE" "$OUT" > "$RUNNER_TEMP/report/du.txt" 2>/dev/null || true
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: build-report
+          path: ${{ runner.temp }}/report
