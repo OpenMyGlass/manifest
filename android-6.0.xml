@@ -88,18 +88,18 @@
        each change is a pull request in the fork, branch glass-6.0. -->
   <remove-project name="platform/build" />
   <project path="build" name="OpenMyGlass/android_build" remote="github" groups="pdk"
-           revision="b093e2485c2eb0d7e97abccc1d2252b73bc5a955" upstream="glass-6.0" >
+           revision="8b735a87aab748f53356e5aba764f1e7e2db5f99" upstream="glass-6.0" >
     <copyfile src="core/root.mk" dest="Makefile" />
   </project>
   <remove-project name="platform/frameworks/native" />
   <project path="frameworks/native" name="OpenMyGlass/android_frameworks_native" remote="github" groups="pdk"
-           revision="b3c2a08be816fbb005568738e00984026d3c7131" upstream="glass-6.0" />
+           revision="ffd6e14f99234e4a529fb7cd7ccb8358c17b3160" upstream="glass-6.0" />
   <remove-project name="platform/frameworks/av" />
   <project path="frameworks/av" name="OpenMyGlass/android_frameworks_av" remote="github" groups="pdk"
-           revision="9e822f14f8e43c6f840bedb686ddbd8ea848c3ea" upstream="glass-6.0" />
+           revision="e8fe2180bbc2a9583c0dbc7904097eb91cf4febc" upstream="glass-6.0" />
 
   <!-- The Glass device tree, 6.0.1 branch. -->
   <project path="device/glass/glass-1" name="OpenMyGlass/android_device_glass_glass-1" remote="github"
-           revision="d63689c9a45bb525c30746a633e6ea0ecc7bbea6" upstream="android-6.0.1_r31" />
+           revision="376cd83b2b05d489a19baea4c96d5b156612d20a" upstream="android-6.0.1_r31" />
 
 </manifest>
