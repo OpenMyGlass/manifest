@@ -7,6 +7,9 @@ on:
   workflow_dispatch:
 permissions:
   contents: read
+concurrency:
+  group: build
+  cancel-in-progress: false
 jobs:
   build:
     runs-on: ubuntu-24.04
@@ -37,7 +40,7 @@ jobs:
         run: |
           git branch -f ci-build HEAD
           tools/build-kitkat.sh --tree "$TREE" --out "$OUT" --stubs \
-            --manifest-url "$GITHUB_WORKSPACE" --manifest-rev ci-build
+            --manifest-url "$GITHUB_WORKSPACE" --manifest-rev ci-build --keep-going
       - name: Report
         if: always()
         run: |
@@ -52,6 +55,7 @@ jobs:
             cp "$TREE/$f" "$RUNNER_TEMP/report/" 2>/dev/null || true
           done
           tail -n 300 "$TREE/build.log" > "$RUNNER_TEMP/report/build-log-tail.txt" 2>/dev/null || true
+          grep -n -B2 -A3 -E 'error:|Error [0-9]+' "$TREE/build.log" > "$RUNNER_TEMP/report/build-errors.txt" 2>/dev/null || true
           du -sh "$TREE" "$OUT" > "$RUNNER_TEMP/report/du.txt" 2>/dev/null || true
       - uses: actions/upload-artifact@v4
         if: always()
