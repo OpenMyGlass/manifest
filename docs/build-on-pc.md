@@ -107,7 +107,7 @@ What changes from Track A:
   glass-kernel SGX module installed, ART and its `arm` boot image present and no Dalvik, the
   `build.prop` release, SDK, runtime (`persist.sys.dalvik.vm.lib.2=libart`) and CPU variant, the
   open hwcomposer, EGL wrapper, `pvrsrvinit` and camera HAL built, and no file of the device
-  tree's `proprietary-files.txt` and no Google-named APK in the image.
+  tree's `proprietary-files.txt` and no Google-named APK or jar in the image.
 
 Not yet measured on a PC or a free runner; the first CI timings will go in marshmallow-base.md,
 "Build on the free runner". Please send back the same files as for Track A, from your

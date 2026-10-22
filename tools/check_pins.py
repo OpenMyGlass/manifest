@@ -41,6 +41,8 @@ def github_compare(repo, base, head):
             return json.load(r)["status"]
     except urllib.error.HTTPError as e:
         return f"error {e.code}"
+    except (urllib.error.URLError, TimeoutError) as e:
+        return f"error {getattr(e, 'reason', e)}"
 
 
 def check(root=ROOT, android="4.4", compare=github_compare):
@@ -69,7 +71,7 @@ def main(argv):
     print("\n".join(lines))
     if problems:
         print(f"{len(problems)} pin(s) not on their upstream branch (ahead or diverged: on a "
-              "pull request branch or no branch)")
+              "pull request branch or no branch; or the commit or branch not found)")
     return 1 if problems else 0
 
 

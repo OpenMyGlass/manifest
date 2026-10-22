@@ -86,7 +86,10 @@ Each fork has a branch `glass-6.0` that starts at the project's AOSP `android-6.
 commit, unchanged. Changes are pull requests. The cherry-picks keep their authorship and their
 `(cherry picked from commit …)` line, and each fork's `check` CI runs
 `tests/check_cherry_picks.sh`: every commit is either ours and touches only `.github/` and
-`tests/`, or has the same patch id as its named source.
+`tests/`, or is an unchanged cherry-pick: its named source is an ancestor of the upstream branch
+it came from (which CI fetches from the upstream repository), it keeps the source's author name,
+email and date, and it has the same patch id. `tests/test_check_cherry_picks.sh` covers each
+failure.
 
 - `build` (base `5806573`), from omap4-aosp `android_build` `aosp-6.0`:
   - `4f20d76c` "Allow a device to generically define its own headers" (CyanogenMod):
@@ -95,7 +98,9 @@ commit, unchanged. Changes are pull requests. The cherry-picks keep their author
   - Not taken: the inline kernel task (the kernel is prebuilt), the "any JDK" change (we use
     OpenJDK 7, as 6.0 expects), recovery and OTA changes.
 - `frameworks/native` (base `89b2934e`), from android-security `aosp-6.0-omap` (Unlegacy-Android's
-  branch; omap4-aosp's `aosp-6.0` has the same changes under other SHAs):
+  branch; omap4-aosp's `aosp-6.0`, on a pre-r81 base, has the three taken commits under other
+  SHAs, `a01d47df`, `ed377653` and `28d48ca5`, but none of the HWC 1.1, `OMAP_ENHANCEMENT` or
+  hwrotation patches listed below):
   - `a4428bf3` egl: Add back b/10194508 workaround (`BOARD_EGL_WORKAROUND_BUG_10194508`);
   - `61d46931` Add back support for glReadPixels screenshot path;
   - `9e22a66c` its board flag, `TARGET_FORCE_SCREENSHOT_CPU_PATH`.
@@ -104,7 +109,8 @@ commit, unchanged. Changes are pull requests. The cherry-picks keep their author
   GLES 1.1 thumbnail fix (SurfaceFlinger uses GLES 2 on the SGX540), and `befbb7ff` "SF: HWC1:
   Propagate the OMAP_ENHANCEMENT flag", which passes `-DOMAP_ENHANCEMENT` to SurfaceFlinger; only
   the HWC 1.1 patches (`c276a6db`, `bdfa0de7`, not taken) test it.
-- `frameworks/av` (base `b7955755`), from the same branch:
+- `frameworks/av` (base `b7955755`), from the same branch (omap4-aosp's `aosp-6.0` has the same
+  changes under other SHAs):
   - `d745b07d` skip the OMX output buffer reallocation when enough buffers exist, on omap4
     (KitKat behaviour, for TI's Ducati codecs);
   - `336ba469` `OMX_TI_COLOR_FormatYUV420PackedSemiPlanar` in `ACodec` (the TI colour format
