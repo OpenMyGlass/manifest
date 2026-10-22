@@ -6,7 +6,7 @@ own** XE24 factory image. CI builds the same tree, but without those binaries
 (`tools/ci-blob-stubs.sh`). Its images are a build check and must never be booted.
 
 Everything runs on your PC. No account, credential or remote access is needed beyond anonymous
-downloads from GitHub (our repositories, including the mirrors, omap4-aosp, and KFire-Android for the
+downloads from GitHub (our repositories and mirrors, omap4-aosp, and KFire-Android for the
 GPU kernel module source), android.googlesource.com (AOSP), storage.googleapis.com
 (the `repo` tool), Docker Hub (`ubuntu:14.04`) and the Ubuntu archive (the build containers).
 
