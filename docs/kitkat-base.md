@@ -26,7 +26,7 @@ omap4-aosp is the organisation that later became Unlegacy-Android. Its `aosp-4.4
 - 32 android-security projects.
 
 This manifest takes every android-security repository with an `aosp-4.4` branch instead (63
-projects): their later fixes need each other. The first CI build stopped in `frameworks/av`
+projects; `art` now comes from our fork, which keeps android-security's commit): their later fixes need each other. The first CI build stopped in `frameworks/av`
 because its Visualizer fix needs `MEASUREMENT_COUNT` from android-security's `system/media`; the
 second, with android-security's own 42-project manifest, because `EffectBundle.cpp` needs
 `EFFECT_PARAM_SIZE_MAX` from its `hardware/libhardware`, which that manifest lacks.
