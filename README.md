@@ -28,7 +28,7 @@ Track A:
   It also leaves out what one ARM device does not need.
 - [docs/kitkat-base.md](docs/kitkat-base.md): which OMAP4 base, and why.
 - [docs/build-on-pc.md](docs/build-on-pc.md): build it on your own Linux PC with your own
-  factory image (`tools/build-kitkat.sh`).
+  factory image (`tools/build-kitkat.sh`); Track B too, with stubs only for now.
 
 No Google file is in this repository. The PowerVR and other Glass binaries come only from the
 owner's own image, extracted at build time by glass-rom's `extract_vendor.py`. CI builds without

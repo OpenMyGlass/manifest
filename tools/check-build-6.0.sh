@@ -52,7 +52,9 @@ prop() {
 }
 prop ro.build.version.release 6.0.1
 prop ro.build.version.sdk 23
-prop persist.sys.dalvik.vm.lib.2 libart.so
+# 6.0's core/main.mk writes the library name without .so (libart); KitKat's runtime property
+# named the file (libart.so).
+prop persist.sys.dalvik.vm.lib.2 libart
 prop dalvik.vm.isa.arm.variant cortex-a9
 prop ro.board.platform omap4
 echo "info: $(grep '^ro.build.version.security_patch=' "$sys/build.prop")"

@@ -46,19 +46,23 @@ Neither omap4-aosp nor Unlegacy-Android has an `aosp-6.0` branch of `android_har
 Their 6.0 manifests (omap4-aosp `android` `aosp-6.0`, last change 2016-09-17, on
 `android-6.0.1_r66`; Unlegacy-Android `android` `aosp-6.0`, 2019, on `r81`) both take its
 `stable` branch, which supported 4.4 to 7.x through `android-api.mk`. `57eec4a` (2016-09-25) is
-the head of omap4-aosp's `stable`, the commit its 6.0 builds used, and the commit the device
+the head of omap4-aosp's `stable`, the branch its 6.0 manifest tracks, and the commit the device
 tree's `docs/hals.md` already documents for the hardware composer. Unlegacy-Android's later
 `stable` moved to DDK `1.12`/`1.14` kernel sources, a proprietary composer and 7.x+ changes,
 so it is not used. LineageOS `cm-13.0` needs CyanogenMod's build system.
 
 It is used unmodified. Its `pvr-source/` (DDK `1.9@2291151` kernel module) is never built: plain
 AOSP has no inline kernel task, and the module comes from glass-kernel (DDK `1.9@2166536`, the
-build of XE24's libraries). Its `omap4.mk` installs, built from source:
+build of XE24's libraries). Its `omap4.mk` (with the `common.mk` it inherits) installs, built
+from source:
 - `hwcomposer.omap4` (HWC 1.0, `hwc/`);
 - `libEGL_POWERVR_SGX54X`, the open `libEGL_POWERVR` wrapper (Kyle Repinski, 2016) that forwards
   each `eglX` to the blob's `IMGeglX` (the GPU path the owner chose);
-- `pvrsrvinit`, `libion_ti`, `libdomx`, the Ducati OMX proxies, `camera.omap4`, `libtiutils`,
-  bltsville (`gc2d` from source, TI's `libbltsville_ticpu`, the same SHA-256 as XE24's).
+- `pvrsrvinit`, `libion_ti`, `libdomx`, the Ducati OMX proxies, `libtiutils`.
+
+The device tree adds the rest from the same project: `camera.omap4` (its `device.mk`), and
+bltsville (`gc2d` from source, TI's `libbltsville_ticpu`, the same SHA-256 as XE24's), which
+`bltsville/Android.mk` installs when the tree's `BoardConfig.mk` sets `TI_OMAP_USE_BLTSVILLE`.
 
 #### Kernel ABI against the Glass kernel
 
@@ -91,13 +95,15 @@ commit, unchanged. Changes are pull requests. The cherry-picks keep their author
   - Not taken: the inline kernel task (the kernel is prebuilt), the "any JDK" change (we use
     OpenJDK 7, as 6.0 expects), recovery and OTA changes.
 - `frameworks/native` (base `89b2934e`), from android-security `aosp-6.0-omap` (Unlegacy-Android's
-  branch, the same commits as omap4-aosp's `aosp-6.0`):
+  branch; omap4-aosp's `aosp-6.0` has the same changes under other SHAs):
   - `a4428bf3` egl: Add back b/10194508 workaround (`BOARD_EGL_WORKAROUND_BUG_10194508`);
   - `61d46931` Add back support for glReadPixels screenshot path;
   - `9e22a66c` its board flag, `TARGET_FORCE_SCREENSHOT_CPU_PATH`.
   Both flags are set by `BoardConfigCommon.mk`. Not taken: the HWC 1.1 framebuffer patches (the
   pinned composer is HWC 1.0), hwrotation (Glass does not rotate), a log-message change and a
-  GLES 1.1 thumbnail fix (SurfaceFlinger uses GLES 2 on the SGX540).
+  GLES 1.1 thumbnail fix (SurfaceFlinger uses GLES 2 on the SGX540), and `befbb7ff` "SF: HWC1:
+  Propagate the OMAP_ENHANCEMENT flag", which passes `-DOMAP_ENHANCEMENT` to SurfaceFlinger; only
+  the HWC 1.1 patches (`c276a6db`, `bdfa0de7`, not taken) test it.
 - `frameworks/av` (base `b7955755`), from the same branch:
   - `d745b07d` skip the OMX output buffer reallocation when enough buffers exist, on omap4
     (KitKat behaviour, for TI's Ducati codecs);
@@ -126,8 +132,10 @@ manifest:
   `DownloadProvider`, `MediaProvider`, `UserDictionaryProvider`, `packages/services/Telephony`,
   `system/` `bt`, `core`, `media`, `vold`. Not covered at all: `bionic`, `art`, `external/skia`,
   `openssl`/`boringssl` and the rest.
-- Our OpenMyGlass mirrors of android-security (Track A) already carry `aosp-6.0` for 32 of them,
-  at the same commits as android-security; 18 would need new mirrors
+- Of the 51, our OpenMyGlass mirrors of android-security (Track A) already carry `aosp-6.0` for
+  32, at the same commits as android-security; `build` is the 51st: OpenMyGlass/android_build is
+  also our `glass-6.0` fork, and its `aosp-6.0` is not android-security's. 18 would need new
+  mirrors
   (`chromium-libpac`, `chromium-webview`, `doclava`, `guava`, `libavc`, `libhevc`, `libmpeg2`,
   `v8`, `frameworks/ex`, `minikin`, `opt/net/wifi`, `support`, `hardware/qcom/audio`,
   `ManagedProvisioning`, `Messaging`, `MediaProvider`, `UserDictionaryProvider`, `system/bt`).
@@ -163,8 +171,8 @@ hardware/ti/omap4 links two open parts against vendor libraries under their gene
 - CI `build` with `android=6.0` builds the whole tree without blobs and runs
   `tools/check-build-6.0.sh`: `system.img`, `boot.img`, `recovery.img` built; the glass-kernel
   SGX module installed; ART (`libart`, `dex2oat`, `dalvikvm`, `core-libart.jar`, the `arm` boot
-  image) present, no `libdvm`/`dexopt`; `build.prop` says 6.0.1, SDK 23, `libart.so` and
-  `cortex-a9`; the open hwcomposer, EGL wrapper, `pvrsrvinit` and camera HAL built; and no
+  image) present, no `libdvm`/`dexopt`; `build.prop` says 6.0.1, SDK 23,
+  `persist.sys.dalvik.vm.lib.2=libart` (6.0 writes the name without `.so`) and `cortex-a9`; the open hwcomposer, EGL wrapper, `pvrsrvinit` and camera HAL built; and no
   Google file: no file listed in the device tree's `proprietary-files.txt` (the files only
   XE24's image has) is in the image, apart from `vendor/firmware/fw_bcmdhd.bin`, which AOSP's
   `hardware/broadcom/wlan` ships, and no APK or jar is named like a Google or stock Glass package.

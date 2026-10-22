@@ -174,7 +174,7 @@ class CheckBuildMarshmallowTest(unittest.TestCase):
         (self.sys / "build.prop").write_text(
             "ro.build.version.release=6.0.1\nro.build.version.sdk=23\n"
             "ro.build.version.security_patch=2017-10-01\nro.board.platform=omap4\n"
-            "persist.sys.dalvik.vm.lib.2=libart.so\ndalvik.vm.isa.arm.variant=cortex-a9\n"
+            "persist.sys.dalvik.vm.lib.2=libart\ndalvik.vm.isa.arm.variant=cortex-a9\n"
             "ro.glass.blob_stubs=true\n")
 
     def check(self, *extra):
@@ -216,6 +216,14 @@ class CheckBuildMarshmallowTest(unittest.TestCase):
         r = self.check()
         self.assertNotEqual(r.returncode, 0)
         self.assertIn("ro.build.version.release", r.stdout)
+
+    def test_runtime_library_with_so_suffix_fails(self):
+        # libart.so is the KitKat form; 6.0.1_r81 core/main.mk writes libart.
+        bp = self.sys / "build.prop"
+        bp.write_text(bp.read_text().replace("vm.lib.2=libart\n", "vm.lib.2=libart.so\n"))
+        r = self.check()
+        self.assertNotEqual(r.returncode, 0)
+        self.assertIn("persist.sys.dalvik.vm.lib.2='libart.so', want 'libart'", r.stdout)
 
 
 class BuildScriptArgsTest(unittest.TestCase):

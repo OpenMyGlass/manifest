@@ -1,8 +1,9 @@
 <!-- SPDX-License-Identifier: Apache-2.0 -->
-# Building Track A on your own Linux PC
+# Building on your own Linux PC
 
-This builds Android 4.4.4 for Glass (ART only) with the PowerVR and other binaries from **your
-own** XE24 factory image. CI builds the same tree, but without those binaries
+This builds Track A, Android 4.4.4 for Glass (ART only), with the PowerVR and other binaries
+from **your own** XE24 factory image (Track B, Android 6.0.1, is
+[below](#track-b-android-601)). CI builds the same tree, but without those binaries
 (`tools/ci-blob-stubs.sh`). Its images are a build check and must never be booted.
 
 Everything runs on your PC. No account, credential or remote access is needed beyond anonymous
@@ -83,6 +84,34 @@ After a run, these files contain no Google file and nothing from your image:
 - the last 200 lines of `~/glass-kk/build.log` if the build failed.
 
 Open an issue with them in OpenMyGlass/manifest, or hand them to the agent.
+
+## Track B (Android 6.0.1)
+
+The same script builds Track B, `android-6.0.xml` (AOSP `android-6.0.1_r81`;
+[marshmallow-base.md](marshmallow-base.md)), with `--android 6.0`. For now it builds only with
+`--stubs`: glass-rom's `extract_vendor.py` does not yet write the generic-name vendor modules
+that `hardware/ti/omap4` links against (marshmallow-base.md, "Next"), so the images are a build
+check and must never be booted.
+
+    manifest/tools/build-kitkat.sh --android 6.0 --tree ~/glass-m --stubs
+
+What changes from Track A:
+- **Source.** `repo init ... -m android-6.0.xml`, the same groups. The kernel step is the same:
+  glass-kernel `tuned-stable` at the commit in `tools/kernel.env`, whose `zImage` and SGX module
+  the device tree's `device.mk` installs.
+- **Container.** `tools/docker-6.0/Dockerfile`: the same Ubuntu 14.04 image with OpenJDK 7, which
+  6.0's build requires, instead of OpenJDK 6.
+- **Disk.** The script stops below 90 GB free (or 35 GB for the source and 55 GB for the output
+  when `--out` is on another file system). Use a different `--tree` from Track A's.
+- **Checks.** `tools/check-build-6.0.sh` writes `check-build.txt`: the three images built, the
+  glass-kernel SGX module installed, ART and its `arm` boot image present and no Dalvik, the
+  `build.prop` release, SDK, runtime (`persist.sys.dalvik.vm.lib.2=libart`) and CPU variant, the
+  open hwcomposer, EGL wrapper, `pvrsrvinit` and camera HAL built, and no file of the device
+  tree's `proprietary-files.txt` and no Google-named APK in the image.
+
+Not yet measured on a PC or a free runner; the first CI timings will go in marshmallow-base.md,
+"Build on the free runner". Please send back the same files as for Track A, from your
+`--tree` (`~/glass-m` above).
 
 ## On a Glass
 
