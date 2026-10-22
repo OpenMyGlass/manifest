@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: Apache-2.0
-"""Check the manifest: AOSP base unchanged, removals real, every outside project pinned.
+"""Check a manifest: AOSP base unchanged, removals real, every outside project pinned.
 
-  tools/check_manifest.py [--upstream FILE]
+  tools/check_manifest.py [--android 4.4|6.0] [--upstream FILE]
 
---upstream is AOSP's default.xml at android-4.4.4_r2.0.1 (platform/manifest); with it, aosp.xml
-must equal it except for the remote's fetch URL.
+--android picks the manifest: 4.4 (Track A, default.xml over aosp.xml, the default) or 6.0
+(Track B, android-6.0.xml over aosp-6.0.xml). --upstream is AOSP's default.xml at that track's
+tag (platform/manifest); with it, the AOSP file must equal it except for the remote's fetch URL.
 """
 import argparse
 import re
@@ -14,25 +15,50 @@ import xml.etree.ElementTree as ET
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-AOSP_TAG = "refs/tags/android-4.4.4_r2.0.1"
 AOSP_FETCH = "https://android.googlesource.com/"
 SHA = re.compile(r"[0-9a-f]{40}")
-# GitHub organisations a project may come from, and why (docs/kitkat-base.md).
+# GitHub organisations a project may come from, and why (docs/kitkat-base.md,
+# docs/marshmallow-base.md).
 ORGS = {
     "OpenMyGlass": "our repositories, forks and mirrors",
     "omap4-aosp": "OMAP4 hardware (later Unlegacy-Android)",
 }
-# Our patched forks: path -> repository.
-FORKS = {
-    "build": "OpenMyGlass/android_build",
-    "frameworks/native": "OpenMyGlass/android_frameworks_native",
-    "libnativehelper": "OpenMyGlass/android_libnativehelper",
-}
 DEVICE = ("device/glass/glass-1", "OpenMyGlass/android_device_glass_glass-1")
-# Every other OpenMyGlass project is an unmodified mirror of android-security's aosp-4.4.
-MIRROR_BRANCH = "aosp-4.4"
 # Groups that the documented repo init leaves out.
 EXCLUDED_GROUPS = {"device", "darwin", "mips", "x86", "notdefault"}
+# Per track: the AOSP file and tag, the top file, our patched forks (path -> repository), and
+# the branch of the unmodified android-security mirrors (every other OpenMyGlass project).
+TRACKS = {
+    "4.4": {
+        "aosp": "aosp.xml",
+        "top": "default.xml",
+        "tag": "refs/tags/android-4.4.4_r2.0.1",
+        "forks": {
+            "build": "OpenMyGlass/android_build",
+            "frameworks/native": "OpenMyGlass/android_frameworks_native",
+            "libnativehelper": "OpenMyGlass/android_libnativehelper",
+        },
+        "mirror_branch": "aosp-4.4",
+        "device_branch": "android-4.4.4",
+    },
+    "6.0": {
+        "aosp": "aosp-6.0.xml",
+        "top": "android-6.0.xml",
+        "tag": "refs/tags/android-6.0.1_r81",
+        "forks": {
+            "build": "OpenMyGlass/android_build",
+            "frameworks/av": "OpenMyGlass/android_frameworks_av",
+            "frameworks/native": "OpenMyGlass/android_frameworks_native",
+        },
+        "fork_branch": "glass-6.0",
+        "mirror_branch": "aosp-6.0",
+        "device_branch": "android-6.0.1_r31",
+    },
+}
+# Track A names, kept for callers.
+AOSP_TAG = TRACKS["4.4"]["tag"]
+FORKS = TRACKS["4.4"]["forks"]
+MIRROR_BRANCH = TRACKS["4.4"]["mirror_branch"]
 
 
 def mirror_name(path):
@@ -43,26 +69,28 @@ def expected_aosp(upstream_text):
     return upstream_text.replace('fetch=".."', f'fetch="{AOSP_FETCH}"', 1)
 
 
-def check(root=ROOT, upstream_text=None):
+def check(root=ROOT, upstream_text=None, android="4.4"):
+    t = TRACKS[android]
+    af, tf, tag, forks = t["aosp"], t["top"], t["tag"], t["forks"]
     problems = []
-    aosp_text = (root / "aosp.xml").read_text()
+    aosp_text = (root / af).read_text()
     aosp = ET.fromstring(aosp_text)
-    top = ET.parse(root / "default.xml").getroot()
+    top = ET.parse(root / tf).getroot()
 
     if upstream_text is not None and aosp_text != expected_aosp(upstream_text):
-        problems.append("aosp.xml differs from AOSP's default.xml beyond the fetch URL")
+        problems.append(f"{af} differs from AOSP's default.xml beyond the fetch URL")
     remotes = {r.get("name"): r.get("fetch") for r in aosp.iter("remote")}
     if remotes != {"aosp": AOSP_FETCH}:
-        problems.append(f"aosp.xml remotes {remotes}, want aosp={AOSP_FETCH}")
+        problems.append(f"{af} remotes {remotes}, want aosp={AOSP_FETCH}")
     default = aosp.find("default")
-    if default is None or default.get("revision") != AOSP_TAG:
-        problems.append(f"aosp.xml default revision is not {AOSP_TAG}")
+    if default is None or default.get("revision") != tag:
+        problems.append(f"{af} default revision is not {tag}")
 
-    if [i.get("name") for i in top.iter("include")] != ["aosp.xml"]:
-        problems.append("default.xml must include aosp.xml and nothing else")
+    if [i.get("name") for i in top.iter("include")] != [af]:
+        problems.append(f"{tf} must include {af} and nothing else")
     top_remotes = {r.get("name"): r.get("fetch") for r in top.iter("remote")}
     if top_remotes != {"github": "https://github.com/"}:
-        problems.append(f"default.xml remotes {top_remotes}, want github=https://github.com/")
+        problems.append(f"{tf} remotes {top_remotes}, want github=https://github.com/")
 
     projects = {p.get("name"): p for p in aosp.iter("project")}
     paths = {p.get("path") or p.get("name"): p.get("name") for p in aosp.iter("project")}
@@ -70,7 +98,7 @@ def check(root=ROOT, upstream_text=None):
     for rp in top.iter("remove-project"):
         name = rp.get("name")
         if name not in projects:
-            problems.append(f"remove-project {name}: not in aosp.xml")
+            problems.append(f"remove-project {name}: not in {af}")
         elif name in removed:
             problems.append(f"remove-project {name}: twice")
         else:
@@ -95,12 +123,16 @@ def check(root=ROOT, upstream_text=None):
         groups = set((p.get("groups") or "").split(",")) - {""}
         if groups & EXCLUDED_GROUPS:
             problems.append(f"{where}: in excluded groups {sorted(groups & EXCLUDED_GROUPS)}")
-        if org == "OpenMyGlass" and path not in FORKS and (path, name) != DEVICE:
+        if path in forks and "fork_branch" in t and p.get("upstream") != t["fork_branch"]:
+            problems.append(f"{where}: fork must have upstream {t['fork_branch']}")
+        if (path, name) == DEVICE and p.get("upstream") != t["device_branch"]:
+            problems.append(f"{where}: device tree must have upstream {t['device_branch']}")
+        if org == "OpenMyGlass" and path not in forks and (path, name) != DEVICE:
             if name != mirror_name(path):
                 problems.append(f"{where}: OpenMyGlass mirror must be {mirror_name(path)}")
-            if p.get("upstream") != MIRROR_BRANCH:
-                problems.append(f"{where}: OpenMyGlass mirror must have upstream {MIRROR_BRANCH}")
-    for path, name in list(FORKS.items()) + [DEVICE]:
+            if p.get("upstream") != t["mirror_branch"]:
+                problems.append(f"{where}: OpenMyGlass mirror must have upstream {t['mirror_branch']}")
+    for path, name in list(forks.items()) + [DEVICE]:
         if paths.get(path) != name:
             problems.append(f"{path}: must be {name}, is {paths.get(path)}")
     return problems
@@ -108,14 +140,16 @@ def check(root=ROOT, upstream_text=None):
 
 def main(argv):
     ap = argparse.ArgumentParser()
+    ap.add_argument("--android", choices=sorted(TRACKS), default="4.4")
     ap.add_argument("--upstream", type=Path)
     args = ap.parse_args(argv)
     upstream = args.upstream.read_text() if args.upstream else None
-    problems = check(upstream_text=upstream)
+    problems = check(upstream_text=upstream, android=args.android)
     for p in problems:
         print(p)
     if not problems:
-        print("manifest ok" + (" (aosp.xml matches upstream)" if upstream else ""))
+        t = TRACKS[args.android]
+        print(f"{t['top']} ok" + (f" ({t['aosp']} matches upstream)" if upstream else ""))
     return 1 if problems else 0
 
 

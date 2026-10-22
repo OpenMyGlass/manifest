@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  SPDX-License-Identifier: Apache-2.0
+
+  OpenMyGlass: Android 6.0.1 (Track B) for Google Glass Explorer Edition.
+  Base and choices: docs/marshmallow-base.md. Every project outside AOSP is pinned to a commit
+  (revision); "upstream" names the branch the commit is on, or will be merged into.
+
+  Checkout: repo init -u https://github.com/OpenMyGlass/manifest -m android-6.0.xml
+  Build: docs/build-on-pc.md (tools/build-kitkat.sh, with the Android 6.0 option).
+-->
+<manifest>
+
+  <!-- AOSP android-6.0.1_r81, unchanged except for the remote URL (tools/check_manifest.py). -->
+  <include name="aosp-6.0.xml" />
+
+  <remote name="github" fetch="https://github.com/" />
+
+  <!-- Not needed for one ARM device (docs/marshmallow-base.md, "Trimming"). -->
+  <remove-project name="device/asus/deb" />
+  <remove-project name="device/asus/flo" />
+  <remove-project name="device/asus/flo-kernel" />
+  <remove-project name="device/asus/fugu" />
+  <remove-project name="device/asus/fugu-kernel" />
+  <remove-project name="device/google/accessory/arduino" />
+  <remove-project name="device/google/accessory/demokit" />
+  <remove-project name="device/google/atv" />
+  <remove-project name="device/htc/flounder" />
+  <remove-project name="device/htc/flounder-kernel" />
+  <remove-project name="device/huawei/angler" />
+  <remove-project name="device/huawei/angler-kernel" />
+  <remove-project name="device/lge/bullhead" />
+  <remove-project name="device/lge/bullhead-kernel" />
+  <remove-project name="device/lge/hammerhead" />
+  <remove-project name="device/lge/hammerhead-kernel" />
+  <remove-project name="device/moto/shamu" />
+  <remove-project name="device/moto/shamu-kernel" />
+  <remove-project name="platform/hardware/intel/audio_media" />
+  <remove-project name="platform/hardware/intel/bootstub" />
+  <remove-project name="platform/hardware/intel/common/bd_prov" />
+  <remove-project name="platform/hardware/intel/common/libmix" />
+  <remove-project name="platform/hardware/intel/common/libstagefrighthw" />
+  <remove-project name="platform/hardware/intel/common/libva" />
+  <remove-project name="platform/hardware/intel/common/libwsbm" />
+  <remove-project name="platform/hardware/intel/common/omx-components" />
+  <remove-project name="platform/hardware/intel/common/utils" />
+  <remove-project name="platform/hardware/intel/common/wrs_omxil_core" />
+  <remove-project name="platform/hardware/intel/img/hwcomposer" />
+  <remove-project name="platform/hardware/intel/img/psb_headers" />
+  <remove-project name="platform/hardware/intel/img/psb_video" />
+  <remove-project name="platform/hardware/intel/sensors" />
+  <remove-project name="platform/hardware/marvell/bt" />
+  <remove-project name="platform/hardware/mediatek" />
+  <remove-project name="platform/hardware/nvidia/audio" />
+  <remove-project name="platform/hardware/qcom/audio" />
+  <remove-project name="platform/hardware/qcom/bt" />
+  <remove-project name="platform/hardware/qcom/camera" />
+  <remove-project name="platform/hardware/qcom/display" />
+  <remove-project name="platform/hardware/qcom/gps" />
+  <remove-project name="platform/hardware/qcom/keymaster" />
+  <remove-project name="platform/hardware/qcom/media" />
+  <remove-project name="platform/hardware/qcom/msm8960" />
+  <remove-project name="platform/hardware/qcom/msm8994" />
+  <remove-project name="platform/hardware/qcom/msm8x26" />
+  <remove-project name="platform/hardware/qcom/msm8x27" />
+  <remove-project name="platform/hardware/qcom/msm8x74" />
+  <remove-project name="platform/hardware/qcom/msm8x84" />
+  <remove-project name="platform/hardware/qcom/power" />
+  <remove-project name="platform/hardware/qcom/sensors" />
+  <remove-project name="platform/hardware/qcom/wlan" />
+  <remove-project name="platform/hardware/ti/omap3" />
+  <remove-project name="platform/hardware/ti/omap4-aah" />
+  <remove-project name="platform/hardware/ti/omap4xxx" />
+  <remove-project name="platform/cts" />
+  <remove-project name="platform/developers/build" />
+  <remove-project name="platform/developers/demos" />
+  <remove-project name="platform/developers/docs" />
+  <remove-project name="platform/developers/samples/android" />
+  <remove-project name="platform/external/eclipse-basebuilder" />
+  <remove-project name="platform/external/eclipse-windowbuilder" />
+
+  <!-- OMAP4 hardware from omap4-aosp (later Unlegacy-Android), branch stable, unmodified: the
+       commit omap4-aosp's own aosp-6.0 manifest built with (September 2016). -->
+  <project path="hardware/ti/omap4" name="omap4-aosp/android_hardware_ti_omap4" remote="github" groups="omap4"
+           revision="57eec4a73e2939d86d0782cb476c8b4a046422b7" upstream="stable" />
+
+  <!-- Our forks: AOSP android-6.0.1_r81 plus pinned cherry-picks (docs/marshmallow-base.md);
+       each change is a pull request in the fork, branch glass-6.0. -->
+  <remove-project name="platform/build" />
+  <project path="build" name="OpenMyGlass/android_build" remote="github" groups="pdk"
+           revision="b093e2485c2eb0d7e97abccc1d2252b73bc5a955" upstream="glass-6.0" >
+    <copyfile src="core/root.mk" dest="Makefile" />
+  </project>
+  <remove-project name="platform/frameworks/native" />
+  <project path="frameworks/native" name="OpenMyGlass/android_frameworks_native" remote="github" groups="pdk"
+           revision="b3c2a08be816fbb005568738e00984026d3c7131" upstream="glass-6.0" />
+  <remove-project name="platform/frameworks/av" />
+  <project path="frameworks/av" name="OpenMyGlass/android_frameworks_av" remote="github" groups="pdk"
+           revision="9e822f14f8e43c6f840bedb686ddbd8ea848c3ea" upstream="glass-6.0" />
+
+  <!-- The Glass device tree, 6.0.1 branch. -->
+  <project path="device/glass/glass-1" name="OpenMyGlass/android_device_glass_glass-1" remote="github"
+           revision="d63689c9a45bb525c30746a633e6ea0ecc7bbea6" upstream="android-6.0.1_r31" />
+
+</manifest>

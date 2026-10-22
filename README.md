@@ -1,8 +1,18 @@
 <!-- SPDX-License-Identifier: Apache-2.0 -->
 # OpenMyGlass manifest
 
-`repo` manifest for Android 4.4.4 (KitKat, ART only) on Google Glass Explorer Edition: Track A of
-the [glass-rom roadmap](https://github.com/OpenMyGlass/glass-rom/blob/main/docs/plans/2026-10-21-open-source-roadmap.md).
+`repo` manifests for Google Glass Explorer Edition, from the
+[glass-rom roadmap](https://github.com/OpenMyGlass/glass-rom/blob/main/docs/plans/2026-10-21-open-source-roadmap.md):
+
+- Track A, Android 4.4.4 (KitKat, ART only): `default.xml`, below.
+- Track B, Android 6.0.1: `android-6.0.xml` over `aosp-6.0.xml` (AOSP `android-6.0.1_r81`), with
+  our forks of `build`, `frameworks/native` and `frameworks/av` (branch `glass-6.0`),
+  `hardware/ti/omap4` from omap4-aosp and the device tree's `android-6.0.1_r31` branch. Check
+  out with `repo init -u https://github.com/OpenMyGlass/manifest -m android-6.0.xml`; build
+  with `tools/build-kitkat.sh --android 6.0` (CI stubs only for now). Base and choices:
+  [docs/marshmallow-base.md](docs/marshmallow-base.md).
+
+Track A:
 
 - `aosp.xml`: AOSP `android-4.4.4_r2.0.1`, unchanged except for the remote URL.
 - `default.xml`: what changes on top of it. Every project outside AOSP is pinned to a commit:
