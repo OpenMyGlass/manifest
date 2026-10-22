@@ -31,12 +31,12 @@ FORKS = {
 DEVICE = ("device/glass/glass-1", "OpenMyGlass/android_device_glass_glass-1")
 # Every other OpenMyGlass project is an unmodified mirror of android-security's aosp-4.4.
 MIRROR_BRANCH = "aosp-4.4"
+# Groups that the documented repo init leaves out.
+EXCLUDED_GROUPS = {"device", "darwin", "mips", "x86", "notdefault"}
 
 
 def mirror_name(path):
-    return "OpenMyGlass/android_" + path.replace("/", "_")
-# Groups that the documented repo init leaves out.
-EXCLUDED_GROUPS = {"device", "darwin", "mips", "x86", "notdefault"}
+    return "OpenMyGlass/android_" + (path or "").replace("/", "_")
 
 
 def expected_aosp(upstream_text):

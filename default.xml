@@ -73,7 +73,7 @@
            revision="7a2cf5a02e17dcbc0b9ad75b22f634bc9a861daf" upstream="android-4.4.4" />
 
   <!-- AOSP projects with Google's KitKat security fixes backported: our unmodified mirrors
-       (OpenMyGlass/android_<path>, forks of android-security, branch aosp-4.4) of every
+       (OpenMyGlass/android_<path> with / as _, forks of android-security, branch aosp-4.4) of every
        android-security repository with an aosp-4.4 branch for a project of aosp.xml
        (docs/kitkat-base.md), except build and frameworks/native, which come from our forks
        above, and hardware/qcom/*, which is removed. -->

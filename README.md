@@ -8,7 +8,7 @@ the [glass-rom roadmap](https://github.com/OpenMyGlass/glass-rom/blob/main/docs/
 - `default.xml`: what changes on top of it. Every project outside AOSP is pinned to a commit:
   - the OMAP4 projects from omap4-aosp (later Unlegacy-Android);
   - the security-patched KitKat projects of android-security, from our unmodified mirrors
-    (`OpenMyGlass/android_<path>`, branch `aosp-4.4`);
+    (`OpenMyGlass/android_<path>` with `/` as `_`, branch `aosp-4.4`);
   - our forks [android_frameworks_native](https://github.com/OpenMyGlass/android_frameworks_native),
     [android_libnativehelper](https://github.com/OpenMyGlass/android_libnativehelper) and
     [android_build](https://github.com/OpenMyGlass/android_build);
