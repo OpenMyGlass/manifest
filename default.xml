@@ -71,7 +71,7 @@
 
   <remove-project name="platform/art" />
   <project path="art" name="OpenMyGlass/android_art" remote="github"
-           revision="95b7b504a480c462bef0da88c649397f53cbf448" upstream="glass-4.4" />
+           revision="90ef778cdbd8aff9a0aacb4e0125e4885857ac73" upstream="glass-4.4" />
 
   <!-- The Glass device tree, KitKat branch. -->
   <project path="device/glass/glass-1" name="OpenMyGlass/android_device_glass_glass-1" remote="github"
