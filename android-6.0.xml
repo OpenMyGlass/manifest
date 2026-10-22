@@ -80,7 +80,7 @@
   <remove-project name="platform/external/eclipse-windowbuilder" />
 
   <!-- OMAP4 hardware from omap4-aosp (later Unlegacy-Android), branch stable, unmodified: the
-       commit omap4-aosp's own aosp-6.0 manifest built with (September 2016). -->
+       head of stable (September 2016), the branch omap4-aosp's own aosp-6.0 manifest tracks. -->
   <project path="hardware/ti/omap4" name="omap4-aosp/android_hardware_ti_omap4" remote="github" groups="omap4"
            revision="57eec4a73e2939d86d0782cb476c8b4a046422b7" upstream="stable" />
 

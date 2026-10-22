@@ -45,6 +45,9 @@ jobs:
           sudo mkdir -p "$OUT" && sudo chown "$(id -u):$(id -g)" "$OUT"
           { echo "## Disk after cleanup ($(( $(date +%s) - t )) s)"; echo '```'; df -h / /mnt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
       - name: Build (no blobs)
+        # Below the job's 360 minutes (the most a GitHub-hosted job may run), so that a build
+        # that runs too long still leaves time for the report and its artifact.
+        timeout-minutes: 335
         run: |
           git branch -f ci-build HEAD
           tools/build-kitkat.sh --android "$ANDROID_VERSION" --tree "$TREE" --out "$OUT" --stubs \

@@ -168,6 +168,10 @@ hardware/ti/omap4 links two open parts against vendor libraries under their gene
   manifest at r81, and checks that every removed project exists, every GitHub project is pinned
   to a commit from an expected organisation, the forks are on `glass-6.0` and the device tree on
   `android-6.0.1_r31`.
+- CI `check`: `tools/check_pins.py` asks GitHub, for both tracks, that every pinned commit is the
+  head of its `upstream` branch or an ancestor of it. A pin on an open pull request's branch
+  fails, so the manifest can be merged only after the fork and device tree pull requests are
+  merged and their merge commits pinned.
 - CI `build` with `android=6.0` builds the whole tree without blobs and runs
   `tools/check-build-6.0.sh`: `system.img`, `boot.img`, `recovery.img` built; the glass-kernel
   SGX module installed; ART (`libart`, `dex2oat`, `dalvikvm`, `core-libart.jar`, the `arm` boot
