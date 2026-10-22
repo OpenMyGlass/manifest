@@ -70,11 +70,12 @@
 
   <!-- The Glass device tree, KitKat branch. -->
   <project path="device/glass/glass-1" name="OpenMyGlass/android_device_glass_glass-1" remote="github"
-           revision="ff373bd88d2b218e08a3c26b9830981eadd7c039" upstream="android-4.4.4" />
+           revision="906bee99fbe446e2ad5cafe9b4d670a258f45c86" upstream="android-4.4.4" />
 
   <!-- AOSP projects with Google's KitKat security fixes backported, from android-security,
-       branch aosp-4.4, unmodified: the set in android-security/android aosp-4.4 default.xml,
-       except build and frameworks/native, which come from our forks above. -->
+       branch aosp-4.4, unmodified: every android-security repository with an aosp-4.4 branch
+       for a project of aosp.xml (docs/kitkat-base.md), except build and frameworks/native, which
+       come from our forks above, and hardware/qcom/*, which is removed. -->
   <remove-project name="platform/art" />
   <project path="art" name="android-security/android_art" remote="github" revision="479fe13d929012cd45c7a92ce140dae0b71e026f" upstream="aosp-4.4" />
   <remove-project name="platform/bionic" />
@@ -83,36 +84,58 @@
   <project path="bootable/recovery" name="android-security/android_bootable_recovery" remote="github" groups="pdk" revision="2dd650e1cbaf1ed308ef659737732adf73aaee84" upstream="aosp-4.4" />
   <remove-project name="platform/dalvik" />
   <project path="dalvik" name="android-security/android_dalvik" remote="github" revision="9d90ae2f9c6f3684d45dffe6000c83a5cfcc9e03" upstream="aosp-4.4" />
+  <remove-project name="device/common" />
+  <project path="device/common" name="android-security/android_device_common" remote="github" revision="9169984cf5b63fe0e6db703981ef84bc298536c4" upstream="aosp-4.4" />
   <remove-project name="platform/external/aac" />
   <project path="external/aac" name="android-security/android_external_aac" remote="github" groups="pdk" revision="ed6db52587a07ae7d1ae735b788be117d0f7cd3e" upstream="aosp-4.4" />
   <remove-project name="platform/external/bluetooth/bluedroid" />
   <project path="external/bluetooth/bluedroid" name="android-security/android_external_bluetooth_bluedroid" remote="github" groups="pdk" revision="0ad4befd2b8d29ebae67f93ffa2d3bd86d298423" upstream="aosp-4.4" />
   <remove-project name="platform/external/bouncycastle" />
   <project path="external/bouncycastle" name="android-security/android_external_bouncycastle" remote="github" revision="19dac08256aeeb2089f7a8567d237dcceb3fe219" upstream="aosp-4.4" />
+  <remove-project name="platform/external/chromium" />
+  <project path="external/chromium" name="android-security/android_external_chromium" remote="github" revision="7cbee047430acb20f77f03a0afa695e00e2367dd" upstream="aosp-4.4" />
   <remove-project name="platform/external/chromium_org" />
   <project path="external/chromium_org" name="android-security/android_external_chromium_org" remote="github" revision="797ceca9e01a052ed40a939abf1369766b83562c" upstream="aosp-4.4" />
   <remove-project name="platform/external/chromium_org/third_party/openssl" />
   <project path="external/chromium_org/third_party/openssl" name="android-security/android_external_chromium_org_third_party_openssl" remote="github" revision="fc78c2134783ad0ae1cfb6b9434fe46c9e324871" upstream="aosp-4.4" />
   <remove-project name="platform/external/dhcpcd" />
   <project path="external/dhcpcd" name="android-security/android_external_dhcpcd" remote="github" revision="2a4c62705081c64ed4f534bf74720cfe527b9fd0" upstream="aosp-4.4" />
+  <remove-project name="platform/external/dnsmasq" />
+  <project path="external/dnsmasq" name="android-security/android_external_dnsmasq" remote="github" groups="pdk" revision="2d3ba5d96100938fff0eb106a2c9a886e7d3e52e" upstream="aosp-4.4" />
+  <remove-project name="platform/external/e2fsprogs" />
+  <project path="external/e2fsprogs" name="android-security/android_external_e2fsprogs" remote="github" groups="pdk" revision="e3ab6d70871502300be86d7f096925cb90ece43c" upstream="aosp-4.4" />
   <remove-project name="platform/external/expat" />
   <project path="external/expat" name="android-security/android_external_expat" remote="github" groups="pdk" revision="6e3530961a2ee0b2a1fae85153abea973e05f0c8" upstream="aosp-4.4" />
   <remove-project name="platform/external/flac" />
   <project path="external/flac" name="android-security/android_external_flac" remote="github" groups="pdk" revision="186999fb06d197713322de5173c8c97ce15d5ffa" upstream="aosp-4.4" />
   <remove-project name="platform/external/freetype" />
   <project path="external/freetype" name="android-security/android_external_freetype" remote="github" groups="pdk" revision="889104daeb0e34f3d6bf8694b0e82253f4bba6bc" upstream="aosp-4.4" />
+  <remove-project name="platform/external/icu4c" />
+  <project path="external/icu4c" name="android-security/android_external_icu4c" remote="github" groups="pdk" revision="452948d5de2c2ff2a1446ec9f0302492875042b8" upstream="aosp-4.4" />
   <remove-project name="platform/external/jhead" />
   <project path="external/jhead" name="android-security/android_external_jhead" remote="github" groups="pdk" revision="9a1a535dcb41fe94fc6b06cf880c33d69cc43f18" upstream="aosp-4.4" />
   <remove-project name="platform/external/jpeg" />
   <project path="external/jpeg" name="android-security/android_external_jpeg" remote="github" groups="pdk" revision="19a6799932f7468f24c972f9acfc314ebbfc9ab2" upstream="aosp-4.4" />
+  <remove-project name="platform/external/libexif" />
+  <project path="external/libexif" name="android-security/android_external_libexif" remote="github" revision="a1b18ad8f124da89f003ebb8fdd7357d549927b5" upstream="aosp-4.4" />
+  <remove-project name="platform/external/libnfc-nci" />
+  <project path="external/libnfc-nci" name="android-security/android_external_libnfc-nci" remote="github" groups="pdk" revision="f5ce9f5cada8ef1fd9232f83b99a46d063f5311c" upstream="aosp-4.4" />
+  <remove-project name="platform/external/libvorbis" />
+  <project path="external/libvorbis" name="android-security/android_external_libvorbis" remote="github" revision="02d2b00fcf2d61304d2926df1e12c51a70130afd" upstream="aosp-4.4" />
   <remove-project name="platform/external/libvpx" />
   <project path="external/libvpx" name="android-security/android_external_libvpx" remote="github" groups="pdk" revision="ca50593b6faf6e7eec44f7ea914566342f9f742a" upstream="aosp-4.4" />
+  <remove-project name="platform/external/libxml2" />
+  <project path="external/libxml2" name="android-security/android_external_libxml2" remote="github" revision="2624f2fa2198c4c45faf7bc2cf23a51c880cf619" upstream="aosp-4.4" />
+  <remove-project name="platform/external/neven" />
+  <project path="external/neven" name="android-security/android_external_neven" remote="github" revision="3c9ce44aed6a63dd4136a81b461835231cc44950" upstream="aosp-4.4" />
   <remove-project name="platform/external/okhttp" />
   <project path="external/okhttp" name="android-security/android_external_okhttp" remote="github" revision="eae39447887e66fa3e27eb664245625e5cf2720f" upstream="aosp-4.4" />
   <remove-project name="platform/external/openssl" />
   <project path="external/openssl" name="android-security/android_external_openssl" remote="github" groups="pdk" revision="14de87dde909ca39d8b54acbdf11e7c96ea82a65" upstream="aosp-4.4" />
   <remove-project name="platform/external/sepolicy" />
   <project path="external/sepolicy" name="android-security/android_external_sepolicy" remote="github" groups="pdk" revision="894c043143238b826fa851d599a8640e50603f82" upstream="aosp-4.4" />
+  <remove-project name="platform/external/sfntly" />
+  <project path="external/sfntly" name="android-security/android_external_sfntly" remote="github" revision="4b70c87cc5d1b15ddc1498787aea468fe0bc07f9" upstream="aosp-4.4" />
   <remove-project name="platform/external/skia" />
   <project path="external/skia" name="android-security/android_external_skia" remote="github" revision="ab8848a12f1cf41dd7472d78993d737fd2f2cc16" upstream="aosp-4.4" />
   <remove-project name="platform/external/sonivox" />
@@ -129,20 +152,36 @@
   <project path="frameworks/base" name="android-security/android_frameworks_base" remote="github" revision="1056ab76ec6a40fda1634f2d40c8ef82a50f5019" upstream="aosp-4.4" />
   <remove-project name="platform/frameworks/opt/telephony" />
   <project path="frameworks/opt/telephony" name="android-security/android_frameworks_opt_telephony" remote="github" groups="pdk" revision="b98e71fccdf3d2623b1f91c69ba4b271b17e19a4" upstream="aosp-4.4" />
+  <remove-project name="platform/hardware/libhardware" />
+  <project path="hardware/libhardware" name="android-security/android_hardware_libhardware" remote="github" groups="pdk" revision="2d60b976f034286fd90aef84e189ca0c984f5ac5" upstream="aosp-4.4" />
+  <remove-project name="platform/hardware/ril" />
+  <project path="hardware/ril" name="android-security/android_hardware_ril" remote="github" groups="pdk" revision="076915cf242cfe629b7a30ea6ae8679efa37d954" upstream="aosp-4.4" />
   <remove-project name="platform/libcore" />
   <project path="libcore" name="android-security/android_libcore" remote="github" revision="e3aeb056b2d3a78dc76f3d45499941ca6513ad9f" upstream="aosp-4.4" />
   <remove-project name="platform/packages/apps/Bluetooth" />
   <project path="packages/apps/Bluetooth" name="android-security/android_packages_apps_Bluetooth" remote="github" revision="c3a81d94797647951b5fa3d15b51f585dcb15d40" upstream="aosp-4.4" />
+  <remove-project name="platform/packages/apps/Camera2" />
+  <project path="packages/apps/Camera2" name="android-security/android_packages_apps_Camera2" remote="github" revision="56ecaa52f82e16de4ed122eb5dc88f61ce238079" upstream="aosp-4.4" />
   <remove-project name="platform/packages/apps/CertInstaller" />
   <project path="packages/apps/CertInstaller" name="android-security/android_packages_apps_CertInstaller" remote="github" revision="a8fcb2b437ef373f5c6e00a85f87c03591f7c07b" upstream="aosp-4.4" />
+  <remove-project name="platform/packages/apps/Contacts" />
+  <project path="packages/apps/Contacts" name="android-security/android_packages_apps_Contacts" remote="github" revision="e657fa9e1cd7a1645ebd9953dccb570e7871b992" upstream="aosp-4.4" />
+  <remove-project name="platform/packages/apps/ContactsCommon" />
+  <project path="packages/apps/ContactsCommon" name="android-security/android_packages_apps_ContactsCommon" remote="github" revision="a4d49bcf318f3976750dc170049dcf1bb8385ff6" upstream="aosp-4.4" />
   <remove-project name="platform/packages/apps/Email" />
   <project path="packages/apps/Email" name="android-security/android_packages_apps_Email" remote="github" revision="8c8321e84e8bbcd53d4c7255b5c0a06e7608ffa8" upstream="aosp-4.4" />
   <remove-project name="platform/packages/apps/Gallery2" />
   <project path="packages/apps/Gallery2" name="android-security/android_packages_apps_Gallery2" remote="github" revision="ed8ff813b04b592251e0987472cf80fde9783762" upstream="aosp-4.4" />
+  <remove-project name="platform/packages/apps/InCallUI" />
+  <project path="packages/apps/InCallUI" name="android-security/android_packages_apps_InCallUI" remote="github" revision="29752d99cc1f55d917fcda1f20dc21feeff18db6" upstream="aosp-4.4" />
   <remove-project name="platform/packages/apps/Mms" />
   <project path="packages/apps/Mms" name="android-security/android_packages_apps_Mms" remote="github" revision="ea70340adb7d0b029d68637688c595c50e8ed5c1" upstream="aosp-4.4" />
   <remove-project name="platform/packages/apps/Nfc" />
   <project path="packages/apps/Nfc" name="android-security/android_packages_apps_Nfc" remote="github" revision="033f035a80bdab91a7596f68620601c7392396fc" upstream="aosp-4.4" />
+  <remove-project name="platform/packages/apps/PackageInstaller" />
+  <project path="packages/apps/PackageInstaller" name="android-security/android_packages_apps_PackageInstaller" remote="github" revision="47bc99aa2d624a7ac4b61a2010bc4c08c1385008" upstream="aosp-4.4" />
+  <remove-project name="platform/packages/apps/QuickSearchBox" />
+  <project path="packages/apps/QuickSearchBox" name="android-security/android_packages_apps_QuickSearchBox" remote="github" revision="c645b05e58f1a04f451e09a57cf9d54b2de0ff65" upstream="aosp-4.4" />
   <remove-project name="platform/packages/apps/Settings" />
   <project path="packages/apps/Settings" name="android-security/android_packages_apps_Settings" remote="github" revision="b835e1b255c6c4ed952686611b6d1adaadb97594" upstream="aosp-4.4" />
   <remove-project name="platform/packages/apps/UnifiedEmail" />
@@ -157,7 +196,11 @@
   <project path="system/core" name="android-security/android_system_core" remote="github" groups="pdk" revision="f8b2fe863354f13d12077a29390a8ba991954feb" upstream="aosp-4.4" />
   <remove-project name="platform/system/media" />
   <project path="system/media" name="android-security/android_system_media" remote="github" groups="pdk" revision="193155d5be52be21b8cbd71b0257f953f8068df6" upstream="aosp-4.4" />
+  <remove-project name="platform/system/netd" />
+  <project path="system/netd" name="android-security/android_system_netd" remote="github" groups="pdk" revision="9d5eed0b94f7674163abeb8d0337757c3854de63" upstream="aosp-4.4" />
   <remove-project name="platform/system/security" />
   <project path="system/security" name="android-security/android_system_security" remote="github" groups="pdk" revision="269371019ffb84c353e874fd616a884c9e4e6d4b" upstream="aosp-4.4" />
+  <remove-project name="platform/system/vold" />
+  <project path="system/vold" name="android-security/android_system_vold" remote="github" groups="pdk" revision="2e397eedff99f4134e389d2f417c2a26f1dfa038" upstream="aosp-4.4" />
 
 </manifest>

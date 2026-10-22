@@ -14,7 +14,7 @@ Task 1. This page records which OMAP4 hardware projects the build uses, and why.
 | `build` | our fork of [omap4-aosp/android_build](https://github.com/omap4-aosp/android_build) `aosp-4.4` (`ba41986`), plus Cortex-A9 code generation | fork |
 | `frameworks/native` | our fork of android-security's `aosp-4.4`, plus omap4-aosp's three OMAP4 screenshot commits and our installd change | fork |
 | `libnativehelper` | our fork of AOSP `android-4.4.4_r2.0.1`, with the JNI fallback set to ART | fork |
-| 42 other AOSP projects | [android-security](https://github.com/android-security) `aosp-4.4`: Google's KitKat security fixes backported, the set of its own `aosp-4.4` manifest (bionic, art, frameworks/base and av, system/core and media, sepolicy, webview, openssl and others) | each pinned |
+| 63 other AOSP projects | [android-security](https://github.com/android-security) `aosp-4.4`: Google's KitKat security fixes backported. Every android-security repository with an `aosp-4.4` branch for a project of AOSP 4.4.4 (bionic, art, frameworks/base and av, system/core, media, vold and netd, hardware/libhardware, sepolicy, webview, openssl and others), except `hardware/qcom/*` | each pinned |
 | `device/glass/glass-1` | [OpenMyGlass/android_device_glass_glass-1](https://github.com/OpenMyGlass/android_device_glass_glass-1) `android-4.4.4` | commit |
 
 omap4-aosp is the organisation that later became Unlegacy-Android. Its `aosp-4.4` manifest
@@ -24,10 +24,11 @@ omap4-aosp is the organisation that later became Unlegacy-Android. Its `aosp-4.4
 - `hardware/ti/omap4`;
 - 32 android-security projects.
 
-This manifest takes the android-security set from android-security's own `aosp-4.4` manifest
-instead (42 projects): their later fixes need projects omap4-aosp's 2016 list lacks. The first
-CI build stopped in `frameworks/av` because its Visualizer fix needs `MEASUREMENT_COUNT` from
-android-security's `system/media`.
+This manifest takes every android-security repository with an `aosp-4.4` branch instead (63
+projects): their later fixes need each other. The first CI build stopped in `frameworks/av`
+because its Visualizer fix needs `MEASUREMENT_COUNT` from android-security's `system/media`; the
+second, with android-security's own 42-project manifest, because `EffectBundle.cpp` needs
+`EFFECT_PARAM_SIZE_MAX` from its `hardware/libhardware`, which that manifest lacks.
 
 Its manifest builds KitKat for the Galaxy Nexus (tuna) and the Galaxy Tab 2 (espresso). This
 manifest follows it, without those devices and their vendor repositories.
