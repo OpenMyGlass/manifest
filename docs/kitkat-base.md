@@ -12,9 +12,10 @@ Task 1. This page records which OMAP4 hardware projects the build uses, and why.
 | AOSP | `android-4.4.4_r2.0.1` (`aosp.xml`, unchanged except the remote URL) | tag |
 | `hardware/ti/omap4` | [omap4-aosp/android_hardware_ti_omap4](https://github.com/omap4-aosp/android_hardware_ti_omap4) `aosp-4.4` | `a99c69f` |
 | `build` | our fork of [omap4-aosp/android_build](https://github.com/omap4-aosp/android_build) `aosp-4.4` (`ba41986`), plus Cortex-A9 code generation | fork |
+| `frameworks/base` | our fork of android-security's `aosp-4.4` (`1056ab7`), plus power-saving backports from later AOSP (glass-rom `docs/plans/2026-10-22-kitkat-power-backports.md`) | fork |
 | `frameworks/native` | our fork of android-security's `aosp-4.4`, plus omap4-aosp's three OMAP4 screenshot commits and our installd change | fork |
 | `libnativehelper` | our fork of AOSP `android-4.4.4_r2.0.1`, with the JNI fallback set to ART | fork |
-| 63 other AOSP projects | unmodified forks of [android-security](https://github.com/android-security)'s `aosp-4.4` (`OpenMyGlass/android_<path>`, with `/` as `_`): Google's KitKat security fixes backported. Every android-security repository with an `aosp-4.4` branch for a project of AOSP 4.4.4 (bionic, art, frameworks/base and av, system/core, media, vold and netd, hardware/libhardware, sepolicy, webview, openssl and others), except `hardware/qcom/*` | each pinned |
+| 62 other AOSP projects | unmodified forks of [android-security](https://github.com/android-security)'s `aosp-4.4` (`OpenMyGlass/android_<path>`, with `/` as `_`): Google's KitKat security fixes backported. Every android-security repository with an `aosp-4.4` branch for a project of AOSP 4.4.4 (bionic, art, frameworks/av, system/core, media, vold and netd, hardware/libhardware, sepolicy, webview, openssl and others), except `hardware/qcom/*` | each pinned |
 | `device/glass/glass-1` | [OpenMyGlass/android_device_glass_glass-1](https://github.com/OpenMyGlass/android_device_glass_glass-1) `android-4.4.4` | commit |
 
 omap4-aosp is the organisation that later became Unlegacy-Android. Its `aosp-4.4` manifest
@@ -102,15 +103,20 @@ Each fork has a branch `glass-4.4`, and each change to it is a pull request with
   - omap4-aosp's three OMAP4 screenshot commits (`17653353`, `2a58e489`, `54e8a773`, cherry-picked
     with `-x`), which `FORCE_SCREENSHOT_CPU_PATH` in `hardware/ti/omap4` relies on;
   - installd: ART only, with dex2oat compiler filters.
+- [android_frameworks_base](https://github.com/OpenMyGlass/android_frameworks_base) (plan Task 5,
+  power ranks 1 and 2): android-security's `aosp-4.4`, plus alarm manager fixes from 5.0/6.0
+  (non-wakeup alarms delayed while the screen is off, 60 s minimum repeat, 5 s minimum
+  futurity, sort fix) and a small Doze adapted from 6.0 for when Glass is off the head (off by
+  default: `config_glassIdleEnabled`). Each upstream commit keeps its author.
 - [android_libnativehelper](https://github.com/OpenMyGlass/android_libnativehelper) (plan Task 2): AOSP
   `android-4.4.4_r2.0.1`, with the device's JNI fallback runtime set to `libart.so`.
 - [android_build](https://github.com/OpenMyGlass/android_build) (plan Task 4): omap4-aosp's `aosp-4.4`,
   with `-mcpu=cortex-a9` and `--no-fix-cortex-a8` for the A9.
 
-Not patched, because nothing needs a patch (both come from our plain mirrors):
-- `frameworks/base`: SystemServer writes back `VMRuntime.vmLibrary()`, which is always
-  `libart.so` now.
-- `packages/apps/Settings`: the runtime picker removes itself when only one runtime library
+Not patched for ART only, because nothing needs a patch:
+- `frameworks/base` (our fork, but not for this): SystemServer writes back
+  `VMRuntime.vmLibrary()`, which is always `libart.so` now.
+- `packages/apps/Settings` (our plain mirror): the runtime picker removes itself when only one runtime library
   exists.
 
 ## Trimming
