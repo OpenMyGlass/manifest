@@ -55,12 +55,16 @@
            revision="a99c69f02e20af59e760763a284a984e6af45ad9" upstream="aosp-4.4" />
 
   <!-- Our forks (patched; each change is a pull request in the fork). build is omap4-aosp's
-       aosp-4.4 plus Cortex-A9 code generation. -->
+       aosp-4.4 plus Cortex-A9 code generation. frameworks/base is android-security's aosp-4.4
+       plus power-saving backports from later AOSP. -->
   <remove-project name="platform/build" />
   <project path="build" name="OpenMyGlass/android_build" remote="github" groups="pdk"
            revision="2619fd598cd331eac3fdb37596f33f28992c8898" upstream="glass-4.4" >
     <copyfile src="core/root.mk" dest="Makefile" />
   </project>
+  <remove-project name="platform/frameworks/base" />
+  <project path="frameworks/base" name="OpenMyGlass/android_frameworks_base" remote="github"
+           revision="589c4132417aa756bc818252966681fe4210ea66" upstream="glass-4.4" />
   <remove-project name="platform/frameworks/native" />
   <project path="frameworks/native" name="OpenMyGlass/android_frameworks_native" remote="github" groups="pdk"
            revision="4dfea054fd19119522376d3ec3a653f3f7a647ce" upstream="glass-4.4" />
@@ -75,8 +79,8 @@
   <!-- AOSP projects with Google's KitKat security fixes backported: our unmodified mirrors
        (OpenMyGlass/android_<path> with / as _, forks of android-security, branch aosp-4.4) of every
        android-security repository with an aosp-4.4 branch for a project of aosp.xml
-       (docs/kitkat-base.md), except build and frameworks/native, which come from our forks
-       above, and hardware/qcom/*, which is removed. -->
+       (docs/kitkat-base.md), except build, frameworks/base and frameworks/native, which come
+       from our forks above, and hardware/qcom/*, which is removed. -->
   <remove-project name="platform/art" />
   <project path="art" name="OpenMyGlass/android_art" remote="github" revision="479fe13d929012cd45c7a92ce140dae0b71e026f" upstream="aosp-4.4" />
   <remove-project name="platform/bionic" />
@@ -149,8 +153,6 @@
   <project path="external/wpa_supplicant_8" name="OpenMyGlass/android_external_wpa_supplicant_8" remote="github" groups="pdk" revision="27c5b9b64c33cf5ddc7eaaaec7570c0c3e9903bd" upstream="aosp-4.4" />
   <remove-project name="platform/frameworks/av" />
   <project path="frameworks/av" name="OpenMyGlass/android_frameworks_av" remote="github" groups="pdk" revision="33e8392def31a7b8b0adfdcf2a9779bdae3693f6" upstream="aosp-4.4" />
-  <remove-project name="platform/frameworks/base" />
-  <project path="frameworks/base" name="OpenMyGlass/android_frameworks_base" remote="github" revision="1056ab76ec6a40fda1634f2d40c8ef82a50f5019" upstream="aosp-4.4" />
   <remove-project name="platform/frameworks/opt/telephony" />
   <project path="frameworks/opt/telephony" name="OpenMyGlass/android_frameworks_opt_telephony" remote="github" groups="pdk" revision="b98e71fccdf3d2623b1f91c69ba4b271b17e19a4" upstream="aosp-4.4" />
   <remove-project name="platform/hardware/libhardware" />
