@@ -131,8 +131,31 @@ Not forked, because nothing needs a patch:
 `sdk` and `development` stay: `build/core/main.mk` includes `sdk/build/windows_sdk_whitelist.mk`
 unconditionally.
 
-Checkout size: 11 GB after `repo sync -c --depth=1` with these groups (CI run 39690816142, 86 s on
-a standard runner).
+Checkout size: 11-12 GB after `repo sync -c --depth=1` with these groups (89 s on a standard
+runner).
+
+## Build on the free runner
+
+The free standard GitHub runner fits a full build (CI `build`, run 39700241850, 2026-10-22,
+without blobs):
+
+| | |
+|---|---|
+| Runner | ubuntu-24.04, 4 vCPU, 15 GB RAM, 145 GB disk (122 GB free after removing preinstalled tools) |
+| Time | `repo sync` 89 s, glass-kernel build 242 s, AOSP build 5192 s, job about 95 minutes |
+| Disk | source 12 GB, output 23 GB, 87 GB still free at the end |
+| Images | `system.img` 196,495,936 bytes, `boot.img` 5,181,440, `recovery.img` 5,744,640 |
+| Checks | `tools/check-build.sh`: no libdvm, dexopt, core.jar or .odex; libart, dex2oat and core-libart.jar present; runtime and dex2oat properties set; no ELF needs libdvm.so |
+
+Earlier attempts failed in `frameworks/av` (see above) and led to the 63-project security set.
+The only remaining build error is ignored by the 4.4 build itself: `recovery.img` tries to copy
+`init.recovery.*.rc`, which this device does not have.
+
+`art/Android.mk` names libdvm only in its phony `use-art`/`use-dalvik` developer targets
+(`adb shell setprop`), which build and link nothing; `check-build.sh` lists it as known.
+
+Not yet measured: the size of an odexed (Dalvik) build for comparison (plan Task 2, step 5).
+
 
 ## Checks
 

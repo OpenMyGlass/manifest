@@ -14,10 +14,10 @@ GPU kernel module source), android.googlesource.com (AOSP), storage.googleapis.c
 
 - Linux on x86_64. AOSP 4.4 needs a case-sensitive file system: ext4 is fine, NTFS or exFAT is
   not.
-- Disk: the script stops below 70 GB free. Plan for about 100 GB for one build; a 200 GB SSD is
+- Disk: the script stops below 70 GB free. One build used 36 GB on the CI runner; a 200 GB SSD is
   enough.
-  - Source: 11 GB after `repo sync` (measured on the CI runner, 2026-10-21).
-  - Output: about 30-40 GB, also a guess.
+  - Source: 11-12 GB after `repo sync`.
+  - Output: 23 GB.
   - The glass-kernel build: a few GB, in `~/glass-kk/.work/` and the docker volume
     `glass-kernel-src`.
   - Containers: about 1 GB.
@@ -31,6 +31,10 @@ GPU kernel module source), android.googlesource.com (AOSP), storage.googleapis.c
 
       tools/fetch-factory.sh factory/
       tools/sparse.py factory/system.img factory/system.raw
+
+Measured on a free GitHub runner (4 vCPU, 16 GB RAM, `--stubs`, run 39700241850, 2026-10-22):
+`repo sync` 89 s, kernel 242 s, build 5192 s (87 minutes), total 92 minutes. A PC with more
+cores builds faster.
 
 ## Build
 

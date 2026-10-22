@@ -77,14 +77,23 @@ else
 fi
 rm -f "$elf_hits"
 
-# No makefile outside dalvik/ names libdvm.
+# No makefile outside dalvik/ names libdvm. Known mentions that build or link nothing:
+#   art/Android.mk: the use-art and use-dalvik developer targets (adb setprop
+#   persist.sys.dalvik.vm.lib); they are phony and run only when asked for.
+allowed='./art/Android.mk'
 mk_hits=$(cd "$tree" && grep -rl --include=Android.mk --exclude-dir=.repo --exclude-dir=out --exclude-dir=.work \
-    -w libdvm . 2>/dev/null \
-    | grep -v '^\./dalvik/' | grep -v '^\./out/' | sort)
-if [ -n "$mk_hits" ]; then
-    bad "Android.mk files outside dalvik/ that name libdvm:"; echo "$mk_hits" | sed 's/^/      /'
+    -w libdvm . 2>/dev/null | grep -v '^\./dalvik/' | grep -v '^\./out/' | sort)
+unexpected=''
+for f in $mk_hits; do
+    case " $allowed " in
+        *" $f "*) echo "info: $f names libdvm (known: developer targets, links nothing)" ;;
+        *) unexpected="$unexpected $f" ;;
+    esac
+done
+if [ -n "$unexpected" ]; then
+    bad "Android.mk files outside dalvik/ that name libdvm:"; for f in $unexpected; do echo "      $f"; done
 else
-    ok "no Android.mk outside dalvik/ names libdvm"
+    ok "no Android.mk outside dalvik/ names libdvm, apart from the known ones"
 fi
 
 # Sizes.

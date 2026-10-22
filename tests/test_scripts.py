@@ -95,6 +95,13 @@ class CheckBuildTest(unittest.TestCase):
         self.assertNotEqual(r.returncode, 0)
         self.assertIn("frameworks/Android.mk", r.stdout)
 
+    def test_known_art_mention_is_allowed(self):
+        (self.tree / "art").mkdir()
+        (self.tree / "art/Android.mk").write_text("use-dalvik:\n\tadb shell setprop x libdvm.so\n")
+        r = self.check()
+        self.assertEqual(r.returncode, 0, r.stdout)
+        self.assertIn("./art/Android.mk names libdvm (known", r.stdout)
+
     @unittest.skipUnless(shutil.which("cc"), "needs cc")
     def test_elf_needing_libdvm_fails(self):
         lib = self.tmp / "libdvm.so"
