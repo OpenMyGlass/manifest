@@ -24,6 +24,7 @@ ORGS = {
 }
 # Our patched forks: path -> repository.
 FORKS = {
+    "art": "OpenMyGlass/android_art",
     "build": "OpenMyGlass/android_build",
     "frameworks/native": "OpenMyGlass/android_frameworks_native",
     "libnativehelper": "OpenMyGlass/android_libnativehelper",

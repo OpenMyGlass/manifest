@@ -14,7 +14,8 @@ Task 1. This page records which OMAP4 hardware projects the build uses, and why.
 | `build` | our fork of [omap4-aosp/android_build](https://github.com/omap4-aosp/android_build) `aosp-4.4` (`ba41986`), plus Cortex-A9 code generation | fork |
 | `frameworks/native` | our fork of android-security's `aosp-4.4`, plus omap4-aosp's three OMAP4 screenshot commits and our installd change | fork |
 | `libnativehelper` | our fork of AOSP `android-4.4.4_r2.0.1`, with the JNI fallback set to ART | fork |
-| 63 other AOSP projects | unmodified forks of [android-security](https://github.com/android-security)'s `aosp-4.4` (`OpenMyGlass/android_<path>`, with `/` as `_`): Google's KitKat security fixes backported. Every android-security repository with an `aosp-4.4` branch for a project of AOSP 4.4.4 (bionic, art, frameworks/base and av, system/core, media, vold and netd, hardware/libhardware, sepolicy, webview, openssl and others), except `hardware/qcom/*` | each pinned |
+| `art` | our fork of android-security's `aosp-4.4` (`479fe13`), plus ART fixes backported from later AOSP (glass-rom `docs/plans/2026-10-22-kitkat-art-fixes.md`) | fork |
+| 62 other AOSP projects | unmodified forks of [android-security](https://github.com/android-security)'s `aosp-4.4` (`OpenMyGlass/android_<path>`, with `/` as `_`): Google's KitKat security fixes backported. Every android-security repository with an `aosp-4.4` branch for a project of AOSP 4.4.4 (bionic, frameworks/base and av, system/core, media, vold and netd, hardware/libhardware, sepolicy, webview, openssl and others), except `hardware/qcom/*` | each pinned |
 | `device/glass/glass-1` | [OpenMyGlass/android_device_glass_glass-1](https://github.com/OpenMyGlass/android_device_glass_glass-1) `android-4.4.4` | commit |
 
 omap4-aosp is the organisation that later became Unlegacy-Android. Its `aosp-4.4` manifest
@@ -106,6 +107,9 @@ Each fork has a branch `glass-4.4`, and each change to it is a pull request with
   `android-4.4.4_r2.0.1`, with the device's JNI fallback runtime set to `libart.so`.
 - [android_build](https://github.com/OpenMyGlass/android_build) (plan Task 4): omap4-aosp's `aosp-4.4`,
   with `-mcpu=cortex-a9` and `--no-fix-cortex-a8` for the A9.
+- [android_art](https://github.com/OpenMyGlass/android_art) (plan Task 5, rank 5): android-security's
+  `aosp-4.4`, plus fixes cherry-picked from AOSP `platform/art` of 2013-2014 (crashes, JNI
+  behaviour that differed from Dalvik, dex2oat failures), each with `-x` and the upstream author.
 
 Not patched, because nothing needs a patch (both come from our plain mirrors):
 - `frameworks/base`: SystemServer writes back `VMRuntime.vmLibrary()`, which is always
