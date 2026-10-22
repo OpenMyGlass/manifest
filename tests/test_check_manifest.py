@@ -45,6 +45,21 @@ class CheckManifestTest(unittest.TestCase):
                   'name="someone/android_hardware_ti_omap4"')
         self.assertTrue(any("organisation someone" in p for p in self.problems()))
 
+    def test_android_security_no_longer_allowed(self):
+        self.edit("default.xml", 'name="OpenMyGlass/android_art"', 'name="android-security/android_art"')
+        self.assertTrue(any("organisation android-security" in p for p in self.problems()))
+
+    def test_mirror_name_and_branch(self):
+        self.edit("default.xml", 'name="OpenMyGlass/android_system_vold"',
+                  'name="OpenMyGlass/android_vold"')
+        self.edit("default.xml", 'name="OpenMyGlass/android_art" remote="github" '
+                  'revision="479fe13d929012cd45c7a92ce140dae0b71e026f" upstream="aosp-4.4"',
+                  'name="OpenMyGlass/android_art" remote="github" '
+                  'revision="479fe13d929012cd45c7a92ce140dae0b71e026f" upstream="glass-4.4"')
+        found = self.problems()
+        self.assertTrue(any("must be OpenMyGlass/android_system_vold" in p for p in found))
+        self.assertTrue(any("project art: OpenMyGlass mirror must have upstream" in p for p in found))
+
     def test_path_clash_without_remove(self):
         self.edit("default.xml", '<remove-project name="platform/libnativehelper" />', "")
         self.assertTrue(any("already used" in p for p in self.problems()))

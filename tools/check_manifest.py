@@ -19,17 +19,22 @@ AOSP_FETCH = "https://android.googlesource.com/"
 SHA = re.compile(r"[0-9a-f]{40}")
 # GitHub organisations a project may come from, and why (docs/kitkat-base.md).
 ORGS = {
-    "OpenMyGlass": "our repositories and forks",
+    "OpenMyGlass": "our repositories, forks and mirrors",
     "omap4-aosp": "OMAP4 hardware (later Unlegacy-Android)",
-    "android-security": "AOSP projects with KitKat security fixes",
 }
-# Our forks: path -> repository. Every other OpenMyGlass project is not a fork.
+# Our patched forks: path -> repository.
 FORKS = {
     "build": "OpenMyGlass/android_build",
     "frameworks/native": "OpenMyGlass/android_frameworks_native",
     "libnativehelper": "OpenMyGlass/android_libnativehelper",
 }
 DEVICE = ("device/glass/glass-1", "OpenMyGlass/android_device_glass_glass-1")
+# Every other OpenMyGlass project is an unmodified mirror of android-security's aosp-4.4.
+MIRROR_BRANCH = "aosp-4.4"
+
+
+def mirror_name(path):
+    return "OpenMyGlass/android_" + path.replace("/", "_")
 # Groups that the documented repo init leaves out.
 EXCLUDED_GROUPS = {"device", "darwin", "mips", "x86", "notdefault"}
 
@@ -91,7 +96,10 @@ def check(root=ROOT, upstream_text=None):
         if groups & EXCLUDED_GROUPS:
             problems.append(f"{where}: in excluded groups {sorted(groups & EXCLUDED_GROUPS)}")
         if org == "OpenMyGlass" and path not in FORKS and (path, name) != DEVICE:
-            problems.append(f"{where}: OpenMyGlass project that is neither a fork nor the device")
+            if name != mirror_name(path):
+                problems.append(f"{where}: OpenMyGlass mirror must be {mirror_name(path)}")
+            if p.get("upstream") != MIRROR_BRANCH:
+                problems.append(f"{where}: OpenMyGlass mirror must have upstream {MIRROR_BRANCH}")
     for path, name in list(FORKS.items()) + [DEVICE]:
         if paths.get(path) != name:
             problems.append(f"{path}: must be {name}, is {paths.get(path)}")
