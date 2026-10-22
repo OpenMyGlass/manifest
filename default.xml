@@ -70,7 +70,7 @@
 
   <!-- The Glass device tree, KitKat branch. -->
   <project path="device/glass/glass-1" name="OpenMyGlass/android_device_glass_glass-1" remote="github"
-           revision="906bee99fbe446e2ad5cafe9b4d670a258f45c86" upstream="android-4.4.4" />
+           revision="7a2cf5a02e17dcbc0b9ad75b22f634bc9a861daf" upstream="android-4.4.4" />
 
   <!-- AOSP projects with Google's KitKat security fixes backported, from android-security,
        branch aosp-4.4, unmodified: every android-security repository with an aosp-4.4 branch
