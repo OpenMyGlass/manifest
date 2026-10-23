@@ -98,7 +98,7 @@
   </project>
   <remove-project name="platform/frameworks/native" />
   <project path="frameworks/native" name="OpenMyGlass/android_frameworks_native" remote="github" groups="pdk"
-           revision="ffd6e14f99234e4a529fb7cd7ccb8358c17b3160" upstream="glass-6.0" />
+           revision="35c965da0eb4984227fae7a9e9caf23b9c8a5bbb" upstream="glass-6.0" />
   <remove-project name="platform/frameworks/av" />
   <project path="frameworks/av" name="OpenMyGlass/android_frameworks_av" remote="github" groups="pdk"
            revision="e8fe2180bbc2a9583c0dbc7904097eb91cf4febc" upstream="glass-6.0" />
