@@ -34,6 +34,7 @@ TRACKS = {
         "top": "default.xml",
         "tag": "refs/tags/android-4.4.4_r2.0.1",
         "forks": {
+            "art": "OpenMyGlass/android_art",
             "build": "OpenMyGlass/android_build",
             "frameworks/native": "OpenMyGlass/android_frameworks_native",
             "libnativehelper": "OpenMyGlass/android_libnativehelper",
