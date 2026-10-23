@@ -84,6 +84,11 @@
   <project path="hardware/ti/omap4" name="omap4-aosp/android_hardware_ti_omap4" remote="github" groups="omap4"
            revision="57eec4a73e2939d86d0782cb476c8b4a046422b7" upstream="stable" />
 
+  <!-- From AOSP at the release tag, but not in its default.xml: hardware/ti/omap4's camera HAL
+       (camera.omap4) links libjhead on Lollipop and later (docs/marshmallow-base.md). -->
+  <project path="external/jhead" name="platform/external/jhead" remote="aosp"
+           revision="a97d4609993ed4391cdb63dd0ada0d37ace82dbe" upstream="refs/tags/android-6.0.1_r81" />
+
   <!-- Our forks: AOSP android-6.0.1_r81 plus pinned cherry-picks (docs/marshmallow-base.md);
        each change is a pull request in the fork, branch glass-6.0. -->
   <remove-project name="platform/build" />

@@ -52,6 +52,10 @@ TRACKS = {
             "frameworks/native": "OpenMyGlass/android_frameworks_native",
         },
         "fork_branch": "glass-6.0",
+        # AOSP projects that the track's tag carries but its default.xml does not list, taken
+        # from AOSP at that tag: hardware/ti/omap4's camera HAL links libjhead
+        # (docs/marshmallow-base.md, "AOSP projects outside the release manifest").
+        "aosp_extra": {"external/jhead": "platform/external/jhead"},
         "mirror_branch": "aosp-6.0",
         "device_branch": "android-6.0.1_r31",
     },
@@ -106,9 +110,21 @@ def check(root=ROOT, upstream_text=None, android="4.4"):
             removed.append(name)
             del paths[projects[name].get("path") or name]
 
+    aosp_extra = t.get("aosp_extra", {})
     for p in top.iter("project"):
         name, path, rev = p.get("name"), p.get("path"), p.get("revision") or ""
         where = f"project {path}"
+        if p.get("remote") == "aosp":
+            if aosp_extra.get(path) != name:
+                problems.append(f"{where}: an AOSP project in {tf} must be one of {aosp_extra}")
+            if not SHA.fullmatch(rev):
+                problems.append(f"{where}: revision {rev!r} is not a 40-hex commit")
+            if p.get("upstream") != tag:
+                problems.append(f"{where}: AOSP project must have upstream {tag}")
+            if path in paths:
+                problems.append(f"{where}: path already used by {paths[path]} (remove it first)")
+            paths[path] = name
+            continue
         if p.get("remote") != "github":
             problems.append(f"{where}: remote must be github")
         org = name.split("/", 1)[0]
@@ -133,7 +149,7 @@ def check(root=ROOT, upstream_text=None, android="4.4"):
                 problems.append(f"{where}: OpenMyGlass mirror must be {mirror_name(path)}")
             if p.get("upstream") != t["mirror_branch"]:
                 problems.append(f"{where}: OpenMyGlass mirror must have upstream {t['mirror_branch']}")
-    for path, name in list(forks.items()) + [DEVICE]:
+    for path, name in list(forks.items()) + list(aosp_extra.items()) + [DEVICE]:
         if paths.get(path) != name:
             problems.append(f"{path}: must be {name}, is {paths.get(path)}")
     return problems

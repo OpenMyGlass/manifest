@@ -26,8 +26,9 @@ and the `build` workflow takes one input, `android` (`4.4` or `6.0`). The Track 
 |---|---|---|
 | AOSP | `android-6.0.1_r81` (`aosp-6.0.xml`, unchanged except the remote URL) | tag |
 | `hardware/ti/omap4` | [omap4-aosp/android_hardware_ti_omap4](https://github.com/omap4-aosp/android_hardware_ti_omap4) `stable` | `57eec4a` |
+| `external/jhead` | AOSP `platform/external/jhead` at the `android-6.0.1_r81` tag, which r81's `default.xml` does not list | commit |
 | `build` | our fork [OpenMyGlass/android_build](https://github.com/OpenMyGlass/android_build) `glass-6.0`: AOSP r81 plus one cherry-pick | commit |
-| `frameworks/native` | our fork [OpenMyGlass/android_frameworks_native](https://github.com/OpenMyGlass/android_frameworks_native) `glass-6.0`: AOSP r81 plus three OMAP4 graphics cherry-picks | commit |
+| `frameworks/native` | our fork [OpenMyGlass/android_frameworks_native](https://github.com/OpenMyGlass/android_frameworks_native) `glass-6.0`: AOSP r81 plus four OMAP4 graphics cherry-picks | commit |
 | `frameworks/av` | our fork [OpenMyGlass/android_frameworks_av](https://github.com/OpenMyGlass/android_frameworks_av) `glass-6.0`: AOSP r81 plus two OMAP4 media cherry-picks | commit |
 | `device/glass/glass-1` | [OpenMyGlass/android_device_glass_glass-1](https://github.com/OpenMyGlass/android_device_glass_glass-1) `android-6.0.1_r31` | commit |
 | kernel, SGX module | glass-kernel `tuned-stable` (`tools/kernel.env`, the same build as Track A), installed from `vendor/glass/kernel` by `device.mk` | commit |
@@ -64,6 +65,17 @@ The device tree adds the rest from the same project: `camera.omap4` (its `device
 bltsville (`gc2d` from source, TI's `libbltsville_ticpu`, the same SHA-256 as XE24's), which
 `bltsville/Android.mk` installs when the tree's `BoardConfig.mk` sets `TI_OMAP_USE_BLTSVILLE`.
 
+#### AOSP projects outside the release manifest
+
+hardware/ti/omap4's `camera/Android.mk` links `libjhead` for the EXIF data on Lollipop and later
+(`ANDROID_API_LP_OR_LATER`), and includes `external/jhead`. AOSP dropped `external/jhead` from
+its 6.0 `default.xml`, but the project still carries an `android-6.0.1_r81` tag, at
+`a97d4609`, which includes Google's 6.0 security fixes for it ("Fix possible out of bounds
+accesses"). `android-6.0.xml` takes it from AOSP at that commit. The first CI build without it
+failed on `camera.omap4` (run 39796851902). `tools/check_manifest.py` allows only the listed
+AOSP projects there, with the tag as `upstream`, and `tools/check_pins.py` checks that the
+pinned commit is the one the tag names.
+
 #### Kernel ABI against the Glass kernel
 
 Compared with kernel-omap `glass-omap-xrx13b-stable-3.4.113` (`b6ea856`, the tuned-stable
@@ -98,16 +110,19 @@ failure.
   - Not taken: the inline kernel task (the kernel is prebuilt), the "any JDK" change (we use
     OpenJDK 7, as 6.0 expects), recovery and OTA changes.
 - `frameworks/native` (base `89b2934e`), from android-security `aosp-6.0-omap` (Unlegacy-Android's
-  branch; omap4-aosp's `aosp-6.0`, on a pre-r81 base, has the three taken commits under other
-  SHAs, `a01d47df`, `ed377653` and `28d48ca5`, but none of the HWC 1.1, `OMAP_ENHANCEMENT` or
-  hwrotation patches listed below):
+  branch; omap4-aosp's `aosp-6.0`, on a pre-r81 base, has the four taken commits under other
+  SHAs, `a01d47df`, `5ac1ac30`, `ed377653` and `28d48ca5`, but none of the HWC 1.1,
+  `OMAP_ENHANCEMENT` or hwrotation patches listed below):
   - `a4428bf3` egl: Add back b/10194508 workaround (`BOARD_EGL_WORKAROUND_BUG_10194508`);
   - `61d46931` Add back support for glReadPixels screenshot path;
-  - `9e22a66c` its board flag, `TARGET_FORCE_SCREENSHOT_CPU_PATH`.
-  Both flags are set by `BoardConfigCommon.mk`. Not taken: the HWC 1.1 framebuffer patches (the
-  pinned composer is HWC 1.0), hwrotation (Glass does not rotate), a log-message change and a
-  GLES 1.1 thumbnail fix (SurfaceFlinger uses GLES 2 on the SGX540), and `befbb7ff` "SF: HWC1:
-  Propagate the OMAP_ENHANCEMENT flag", which passes `-DOMAP_ENHANCEMENT` to SurfaceFlinger; only
+  - `9e22a66c` its board flag, `TARGET_FORCE_SCREENSHOT_CPU_PATH`;
+  - `c95b8a7d` Remove "using EGL_IMG_context_priority" warning: r81's SurfaceFlinger defines
+    `HAS_CONTEXT_PRIORITY` on omap4 and builds with `-Werror`, so the `#warning` stops the build
+    (CI run 39796851902).
+  `BoardConfigCommon.mk` sets both board flags. Not taken: the HWC 1.1 framebuffer patches (the
+  pinned composer is HWC 1.0), hwrotation (Glass does not rotate), a GLES 1.1 thumbnail fix
+  (SurfaceFlinger uses GLES 2 on the SGX540), and `befbb7ff` "SF: HWC1: Propagate the
+  OMAP_ENHANCEMENT flag", which passes `-DOMAP_ENHANCEMENT` to SurfaceFlinger; only
   the HWC 1.1 patches (`c276a6db`, `bdfa0de7`, not taken) test it.
 - `frameworks/av` (base `b7955755`), from the same branch (omap4-aosp's `aosp-6.0` has the same
   changes under other SHAs):

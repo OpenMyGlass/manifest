@@ -134,6 +134,18 @@ class CheckMarshmallowManifestTest(unittest.TestCase):
         self.assertTrue(any("device tree must have upstream android-6.0.1_r31" in p
                             for p in self.problems()))
 
+    def test_aosp_extra_project(self):
+        self.edit("android-6.0.xml", 'upstream="refs/tags/android-6.0.1_r81"',
+                  'upstream="refs/heads/master"')
+        self.assertTrue(any("external/jhead: AOSP project must have upstream" in p
+                            for p in self.problems()))
+
+    def test_only_listed_aosp_projects(self):
+        self.edit("android-6.0.xml", 'name="platform/external/jhead"', 'name="platform/external/other"')
+        found = self.problems()
+        self.assertTrue(any("an AOSP project in android-6.0.xml must be one of" in p for p in found))
+        self.assertTrue(any("external/jhead: must be platform/external/jhead" in p for p in found))
+
     def test_unlegacy_is_not_an_allowed_organisation(self):
         self.edit("android-6.0.xml", 'name="omap4-aosp/android_hardware_ti_omap4"',
                   'name="Unlegacy-Android/android_hardware_ti_omap4"')

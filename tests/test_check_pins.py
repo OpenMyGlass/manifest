@@ -10,13 +10,16 @@ import check_pins  # noqa: E402
 
 
 class CheckPinsTest(unittest.TestCase):
-    def run_check(self, android, status):
+    JHEAD = "a97d4609993ed4391cdb63dd0ada0d37ace82dbe"
+
+    def run_check(self, android, status, tag=JHEAD):
         calls = []
 
         def compare(repo, base, head):
             calls.append((repo, base, head))
             return status(repo)
-        lines, problems = check_pins.check(android=android, compare=compare)
+        lines, problems = check_pins.check(android=android, compare=compare,
+                                           tag_commit=lambda name, t: tag)
         return calls, lines, problems
 
     def test_every_github_project_is_compared_against_its_upstream(self):
@@ -45,6 +48,15 @@ class CheckPinsTest(unittest.TestCase):
                 self.assertEqual(len(problems), 1)
                 self.assertIn("build:", problems[0])
                 self.assertIn(status, problems[0])
+
+
+    def test_aosp_project_must_be_its_tag(self):
+        _, lines, problems = self.run_check("6.0", lambda repo: "behind")
+        self.assertIn("ok   external/jhead: a97d4609993e on platform/external/jhead "
+                      "refs/tags/android-6.0.1_r81: identical", lines)
+        _, _, problems = self.run_check("6.0", lambda repo: "behind", tag="0" * 40)
+        self.assertEqual(len(problems), 1)
+        self.assertIn("external/jhead", problems[0])
 
 
 if __name__ == "__main__":

@@ -5,7 +5,9 @@
   tools/check_pins.py [--android 4.4|6.0]
 
 For each project of the track's top manifest (default.xml or android-6.0.xml), asks GitHub's
-compare API whether `revision` is the head of `upstream` or an ancestor of it. A pin that is
+compare API whether `revision` is the head of `upstream` or an ancestor of it. For an AOSP
+project (remote aosp), `upstream` is a tag and `revision` must be the commit it names
+(`git ls-remote` on android.googlesource.com). A pin that is
 only on a pull request branch, or on no branch, fails: merge the pull request first and pin its
 merge commit. Needs network access; set GITHUB_TOKEN (or GH_TOKEN) for GitHub's higher rate
 limit. Prints one line per project and exits 1 if any pin is off its branch.
@@ -13,6 +15,7 @@ limit. Prints one line per project and exits 1 if any pin is off its branch.
 import argparse
 import json
 import os
+import subprocess
 import sys
 import urllib.error
 import urllib.parse
@@ -25,6 +28,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from check_manifest import TRACKS  # noqa: E402
 
 API = "https://api.github.com"
+AOSP = "https://android.googlesource.com/"
 
 
 def github_compare(repo, base, head):
@@ -45,15 +49,30 @@ def github_compare(repo, base, head):
         return f"error {getattr(e, 'reason', e)}"
 
 
-def check(root=ROOT, android="4.4", compare=github_compare):
+def aosp_tag_commit(name, tag):
+    """The commit an AOSP tag names (peeled), or None."""
+    try:
+        out = subprocess.run(["git", "ls-remote", AOSP + name, tag, tag + "^{}"],
+                             capture_output=True, text=True, timeout=120, check=True).stdout
+    except (subprocess.SubprocessError, OSError):
+        return None
+    refs = dict(line.split("\t")[::-1] for line in out.splitlines() if "\t" in line)
+    return refs.get(tag + "^{}") or refs.get(tag)
+
+
+def check(root=ROOT, android="4.4", compare=github_compare, tag_commit=aosp_tag_commit):
     top = ET.parse(root / TRACKS[android]["top"]).getroot()
     lines, problems = [], []
     for p in top.iter("project"):
-        if p.get("remote") != "github":
-            continue
         name, path = p.get("name"), p.get("path") or p.get("name")
         rev, branch = p.get("revision") or "", p.get("upstream") or ""
-        status = compare(name, branch, rev)
+        if p.get("remote") == "aosp":
+            commit = tag_commit(name, branch)
+            status = "identical" if commit == rev else f"tag names {commit}"
+        elif p.get("remote") == "github":
+            status = compare(name, branch, rev)
+        else:
+            continue
         line = f"{path}: {rev[:12]} on {name} {branch}: {status}"
         if status in ("identical", "behind"):
             lines.append("ok   " + line)
