@@ -52,13 +52,13 @@ class CheckManifestTest(unittest.TestCase):
     def test_mirror_name_and_branch(self):
         self.edit("default.xml", 'name="OpenMyGlass/android_system_vold"',
                   'name="OpenMyGlass/android_vold"')
-        self.edit("default.xml", 'name="OpenMyGlass/android_art" remote="github" '
-                  'revision="479fe13d929012cd45c7a92ce140dae0b71e026f" upstream="aosp-4.4"',
-                  'name="OpenMyGlass/android_art" remote="github" '
-                  'revision="479fe13d929012cd45c7a92ce140dae0b71e026f" upstream="glass-4.4"')
+        self.edit("default.xml", 'name="OpenMyGlass/android_bionic" remote="github" groups="pdk" '
+                  'revision="b351ec422dd055a372052a8b152a300ad06b3b34" upstream="aosp-4.4"',
+                  'name="OpenMyGlass/android_bionic" remote="github" groups="pdk" '
+                  'revision="b351ec422dd055a372052a8b152a300ad06b3b34" upstream="glass-4.4"')
         found = self.problems()
         self.assertTrue(any("must be OpenMyGlass/android_system_vold" in p for p in found))
-        self.assertTrue(any("project art: OpenMyGlass mirror must have upstream" in p for p in found))
+        self.assertTrue(any("project bionic: OpenMyGlass mirror must have upstream" in p for p in found))
 
     def test_path_clash_without_remove(self):
         self.edit("default.xml", '<remove-project name="platform/libnativehelper" />', "")

@@ -55,7 +55,8 @@
            revision="a99c69f02e20af59e760763a284a984e6af45ad9" upstream="aosp-4.4" />
 
   <!-- Our forks (patched; each change is a pull request in the fork). build is omap4-aosp's
-       aosp-4.4 plus Cortex-A9 code generation. -->
+       aosp-4.4 plus Cortex-A9 code generation. art is android-security's aosp-4.4 plus ART
+       fixes backported from later AOSP. -->
   <remove-project name="platform/build" />
   <project path="build" name="OpenMyGlass/android_build" remote="github" groups="pdk"
            revision="2619fd598cd331eac3fdb37596f33f28992c8898" upstream="glass-4.4" >
@@ -68,6 +69,10 @@
   <project path="libnativehelper" name="OpenMyGlass/android_libnativehelper" remote="github" groups="pdk-java"
            revision="7287d590b7e4da0a3a06160b1db9aaeba185f9c5" upstream="glass-4.4" />
 
+  <remove-project name="platform/art" />
+  <project path="art" name="OpenMyGlass/android_art" remote="github"
+           revision="43dd266ff35f120c19131e95338268100447fc0f" upstream="glass-4.4" />
+
   <!-- The Glass device tree, KitKat branch. -->
   <project path="device/glass/glass-1" name="OpenMyGlass/android_device_glass_glass-1" remote="github"
            revision="2bcf4dc6fbaad982a9b7ab68bbd447fd1d050b50" upstream="android-4.4.4" />
@@ -75,10 +80,8 @@
   <!-- AOSP projects with Google's KitKat security fixes backported: our unmodified mirrors
        (OpenMyGlass/android_<path> with / as _, forks of android-security, branch aosp-4.4) of every
        android-security repository with an aosp-4.4 branch for a project of aosp.xml
-       (docs/kitkat-base.md), except build and frameworks/native, which come from our forks
-       above, and hardware/qcom/*, which is removed. -->
-  <remove-project name="platform/art" />
-  <project path="art" name="OpenMyGlass/android_art" remote="github" revision="479fe13d929012cd45c7a92ce140dae0b71e026f" upstream="aosp-4.4" />
+       (docs/kitkat-base.md), except build, frameworks/native and art, which come from our
+       forks above, and hardware/qcom/*, which is removed. -->
   <remove-project name="platform/bionic" />
   <project path="bionic" name="OpenMyGlass/android_bionic" remote="github" groups="pdk" revision="b351ec422dd055a372052a8b152a300ad06b3b34" upstream="aosp-4.4" />
   <remove-project name="platform/bootable/recovery" />

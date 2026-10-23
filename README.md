@@ -10,8 +10,9 @@ the [glass-rom roadmap](https://github.com/OpenMyGlass/glass-rom/blob/main/docs/
   - the security-patched KitKat projects of android-security, from our unmodified mirrors
     (`OpenMyGlass/android_<path>` with `/` as `_`, branch `aosp-4.4`);
   - our forks [android_frameworks_native](https://github.com/OpenMyGlass/android_frameworks_native),
-    [android_libnativehelper](https://github.com/OpenMyGlass/android_libnativehelper) and
-    [android_build](https://github.com/OpenMyGlass/android_build);
+    [android_libnativehelper](https://github.com/OpenMyGlass/android_libnativehelper),
+    [android_build](https://github.com/OpenMyGlass/android_build) and
+    [android_art](https://github.com/OpenMyGlass/android_art);
   - the device tree's [`android-4.4.4`](https://github.com/OpenMyGlass/android_device_glass_glass-1/tree/android-4.4.4)
     branch.
 
