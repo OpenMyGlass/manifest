@@ -23,10 +23,26 @@ jobs:
       - name: XML
         run: |
           command -v xmllint >/dev/null || { sudo apt-get update -q && sudo apt-get install -y -q libxml2-utils; }
-          xmllint --noout default.xml aosp.xml
+          xmllint --noout default.xml aosp.xml android-6.0.xml aosp-6.0.xml
       - name: Manifest against AOSP's android-4.4.4_r2.0.1 manifest
         run: |
           curl -fsSL --retry 3 \
             "https://android.googlesource.com/platform/manifest/+/refs/tags/android-4.4.4_r2.0.1/default.xml?format=TEXT" \
             | base64 -d > "$RUNNER_TEMP/upstream.xml"
           python3 tools/check_manifest.py --upstream "$RUNNER_TEMP/upstream.xml"
+      - name: Manifest against AOSP's android-6.0.1_r81 manifest
+        run: |
+          curl -fsSL --retry 3 \
+            "https://android.googlesource.com/platform/manifest/+/refs/tags/android-6.0.1_r81/default.xml?format=TEXT" \
+            | base64 -d > "$RUNNER_TEMP/upstream-6.0.xml"
+          python3 tools/check_manifest.py --android 6.0 --upstream "$RUNNER_TEMP/upstream-6.0.xml"
+      - name: Pins on their upstream branches
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          # A fork or device tree pin must be merged (the head of its upstream branch or an
+          # ancestor of it), not only on a pull request branch.
+          fail=0
+          python3 tools/check_pins.py --android 4.4 || fail=1
+          python3 tools/check_pins.py --android 6.0 || fail=1
+          exit $fail

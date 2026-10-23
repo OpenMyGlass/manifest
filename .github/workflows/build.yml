@@ -1,14 +1,21 @@
 # SPDX-License-Identifier: Apache-2.0
-# Full Track A build on a free standard runner, without blobs (tools/ci-blob-stubs.sh): the
-# image is a build check only and is not uploaded. Records disk and time in the job summary
-# and in the "build-report" artifact. Run by hand (Actions, build, Run workflow).
+# Full build of Track A (Android 4.4, default.xml) or Track B (Android 6.0, android-6.0.xml) on a
+# free standard runner, without blobs (tools/ci-blob-stubs.sh): the image is a build check only
+# and is not uploaded. Records disk and time in the job summary and in the "build-report"
+# artifact. Run by hand (Actions, build, Run workflow), choosing the Android version.
 name: build
 on:
   workflow_dispatch:
+    inputs:
+      android:
+        description: Android version (4.4 is Track A, 6.0 is Track B)
+        type: choice
+        options: ["4.4", "6.0"]
+        default: "4.4"
 permissions:
   contents: read
 concurrency:
-  group: build
+  group: build-${{ inputs.android }}
   cancel-in-progress: false
 jobs:
   build:
@@ -17,6 +24,7 @@ jobs:
     env:
       TREE: /home/runner/aosp
       OUT: /mnt/aosp-out
+      ANDROID_VERSION: ${{ inputs.android }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -37,9 +45,12 @@ jobs:
           sudo mkdir -p "$OUT" && sudo chown "$(id -u):$(id -g)" "$OUT"
           { echo "## Disk after cleanup ($(( $(date +%s) - t )) s)"; echo '```'; df -h / /mnt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
       - name: Build (no blobs)
+        # Below the job's 360 minutes (the most a GitHub-hosted job may run), so that a build
+        # that runs too long still leaves time for the report and its artifact.
+        timeout-minutes: 335
         run: |
           git branch -f ci-build HEAD
-          tools/build-kitkat.sh --tree "$TREE" --out "$OUT" --stubs \
+          tools/build-kitkat.sh --android "$ANDROID_VERSION" --tree "$TREE" --out "$OUT" --stubs \
             --manifest-url "$GITHUB_WORKSPACE" --manifest-rev ci-build --keep-going
       - name: Report
         if: always()
@@ -60,5 +71,5 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: build-report
+          name: build-report-${{ inputs.android }}
           path: ${{ runner.temp }}/report
